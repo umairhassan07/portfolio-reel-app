@@ -4,9 +4,10 @@ import { PortfolioReel } from "./compositions/PortfolioReel";
 import { FORMAT_COMPOSITION } from "./lambda/render";
 
 const IS_PROD = import.meta.env.PROD;
-// In production, calls go to the Render.com render server.
-// In dev, falls back to the Vite dev server middleware.
 const RENDER_BASE = import.meta.env.VITE_RENDER_SERVER_URL ?? "";
+// Use SSE streaming when a Railway/external render server is configured.
+// Only use Lambda polling when explicitly on cloud mode with no external server.
+const HAS_RENDER_SERVER = !!import.meta.env.VITE_RENDER_SERVER_URL;
 
 const ACC = "#6C63FF";
 
@@ -72,7 +73,8 @@ export default function ExportModal({ onClose, inputProps, totalDuration }) {
     setErrorMsg("");
     setCloudUrl(null);
 
-    const usePolling = IS_PROD || renderMode === "cloud";
+    // Use Lambda polling only when: cloud mode AND no external render server configured
+    const usePolling = !HAS_RENDER_SERVER && (IS_PROD || renderMode === "cloud");
 
     if (usePolling) {
       // ── Cloud / Production: start Lambda job, then poll /api/progress ──
