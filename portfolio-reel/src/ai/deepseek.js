@@ -500,15 +500,15 @@ function toolLabel(name, args) {
 // ── Direct build fallback — bypasses LLM tool calling entirely ──────────────
 // Used when DeepSeek refuses to call tools properly (outputs text or DSML).
 const DIRECT_PRESETS = {
-  fashion:  { accent:"#ff6b9d", bgFrom:"#150010", bgTo:"#250020", layout:"fullscreen", audio:"aesthetic",    font:"Playfair Display", weight:900, tagFont:"DM Sans", tagWeight:300, projectName:"Elegance",    tagline:"Style Defined",      handle:"@style.reel",    queries:["fashion model pastel silk portrait","luxury dress elegant editorial","model runway haute couture pastel"] },
-  fitness:  { accent:"#ff4500", bgFrom:"#1a0300", bgTo:"#2a0600", layout:"fullscreen", audio:"motivational", font:"Bebas Neue",       weight:400, tagFont:"Montserrat", tagWeight:800, projectName:"Beast Mode",   tagline:"No Days Off",        handle:"@fitlife",       queries:["athlete gym workout intensity portrait","fitness model running motivation","crossfit training sweat closeup"] },
-  travel:   { accent:"#00d4ff", bgFrom:"#000d1a", bgTo:"#001428", layout:"fullscreen", audio:"cinematic",    font:"Playfair Display", weight:700, tagFont:"Poppins",    tagWeight:300, projectName:"Wanderlust",   tagline:"Every Mile Matters", handle:"@travel.reel",   queries:["aerial mountain golden hour dramatic","traveler adventure cliff sunrise","tropical beach paradise crystal water"] },
-  food:     { accent:"#f5a623", bgFrom:"#150800", bgTo:"#250e00", layout:"phone_mockup",audio:"calm",         font:"Playfair Display", weight:900, tagFont:"DM Sans",    tagWeight:400, projectName:"Savor",        tagline:"Art On A Plate",     handle:"@food.reel",     queries:["gourmet dish fine dining closeup","chef plating artistic food","street food market vibrant colors"] },
-  music:    { accent:"#b44fff", bgFrom:"#0d0018", bgTo:"#180030", layout:"fullscreen", audio:"phonk",        font:"Bebas Neue",       weight:400, tagFont:"Space Grotesk", tagWeight:600, projectName:"The Drop",    tagline:"Feel The Beat",      handle:"@music.reel",    queries:["dj concert neon lights crowd","musician recording studio headphones","vinyl record aesthetic dark moody"] },
-  luxury:   { accent:"#f5c842", bgFrom:"#080600", bgTo:"#151000", layout:"fullscreen", audio:"cinematic",    font:"Playfair Display", weight:900, tagFont:"Inter",       tagWeight:300, projectName:"Prestige",     tagline:"Beyond Ordinary",    handle:"@luxury.reel",   queries:["luxury penthouse interior gold","premium watch jewelry bokeh dark","rich lifestyle yacht sunset"] },
-  tech:     { accent:"#6C63FF", bgFrom:"#0a0014", bgTo:"#160030", layout:"phone_mockup",audio:"tech",         font:"Space Grotesk",    weight:700, tagFont:"Roboto Mono", tagWeight:400, projectName:"Dev Portfolio",tagline:"Code. Ship. Repeat.", handle:"@dev.reel",      queries:["developer coding dark neon screen","programmer laptop coffee workspace","code terminal green text monitor"] },
-  minimal:  { accent:"#ffffff", bgFrom:"#080808", bgTo:"#151515", layout:"fullscreen", audio:"lofi",         font:"Inter",            weight:800, tagFont:"Inter",       tagWeight:300, projectName:"Minimal",      tagline:"Less Is More",       handle:"@minimal.reel",  queries:["minimal abstract clean composition","elegant simple lifestyle portrait","modern architecture clean lines"] },
-  surprise: { accent:"#00ffcc", bgFrom:"#00001a", bgTo:"#0d0030", layout:"fullscreen", audio:"aesthetic",    font:"Poppins",          weight:800, tagFont:"Inter",       tagWeight:300, projectName:"Unfiltered",   tagline:"Expect Nothing. See Everything.", handle:"@reelstudio", queries:["surreal neon portrait cinematic","abstract glowing light trail dark","futuristic cyberpunk street neon rain"] },
+  fashion:  { accent:"#E8C4A0", bgFrom:"#0c0806", bgTo:"#1a1008", layout:"fullscreen", audio:"aesthetic",    font:"Playfair Display", weight:900, tagFont:"DM Sans",      tagWeight:300, projectName:"Elegance",     tagline:"Style Defined",       handle:"@style.reel",   queries:["editorial fashion model dramatic shadow studio","luxury street style cinematic bokeh portrait","haute couture dramatic wind movement elegant","fashion model golden light minimal studio"], voiceScripts:["Wear the story. Own the moment.","Every stitch tells a secret.","Style is a language. Speak it boldly.","Timeless. Effortless. You."] },
+  fitness:  { accent:"#FF3D00", bgFrom:"#120100", bgTo:"#1f0200", layout:"fullscreen", audio:"motivational", font:"Bebas Neue",        weight:400, tagFont:"Montserrat",   tagWeight:900, projectName:"Beast Mode",    tagline:"No Days Off",         handle:"@fitlife",      queries:["athlete explosive gym training dark cinematic","fitness warrior golden hour outdoor dramatic","crossfit chalk hands weights closeup intensity","bodybuilder shadow silhouette dramatic light"], voiceScripts:["Train like your life depends on it.","Champions are built in the dark.","No excuses. Only results.","Pain is temporary. Legacy is forever."] },
+  travel:   { accent:"#00C9FF", bgFrom:"#000e1f", bgTo:"#001833", layout:"fullscreen", audio:"cinematic",    font:"Playfair Display", weight:700, tagFont:"Poppins",       tagWeight:300, projectName:"The World Awaits", tagline:"Go Further",         handle:"@travel.reel",  queries:["cinematic golden hour mountain aerial drone dramatic","solo traveler cliffside mist adventure dramatic","crystal ocean wave crashing dramatic slow motion","mountain peak sunrise clouds breathtaking aerial","tropical paradise lagoon cinematic turquoise"], voiceScripts:["The world is bigger than your fears.","Every horizon hides a story.","Go where the map ends.","Adventure is the only answer.","Home is everywhere you dare to go."] },
+  food:     { accent:"#FF8C42", bgFrom:"#0f0600", bgTo:"#1a0c00", layout:"phone_mockup",audio:"calm",         font:"Playfair Display", weight:900, tagFont:"DM Sans",       tagWeight:400, projectName:"Savor",         tagline:"Art On A Plate",      handle:"@food.reel",    queries:["michelin star plating macro detail dramatic light","chef hands artisan craft closeup bokeh","vibrant spice market textures color explosion","gourmet dessert gold leaf detail dark"],    voiceScripts:["Food is love on a plate.","Every bite tells a story.","Crafted with passion. Served with soul.","Taste the art of perfection."] },
+  music:    { accent:"#C77DFF", bgFrom:"#07000f", bgTo:"#120020", layout:"fullscreen", audio:"phonk",        font:"Bebas Neue",        weight:400, tagFont:"Space Grotesk", tagWeight:600, projectName:"The Drop",      tagline:"Feel The Beat",       handle:"@music.reel",   queries:["concert crowd energy light beams euphoria dark","artist recording studio moody dark vibe","vinyl record warm grain retro aesthetic","dj booth neon lights dark festival energy"],     voiceScripts:["Music doesn't lie. Feel it.","Drop everything. This is your moment.","The beat knows what words can't say.","Turn it up. Live in the sound."] },
+  luxury:   { accent:"#D4AF37", bgFrom:"#060401", bgTo:"#100900", layout:"fullscreen", audio:"cinematic",    font:"Playfair Display", weight:900, tagFont:"Inter",          tagWeight:200, projectName:"Prestige",      tagline:"Beyond Ordinary",     handle:"@luxury.reel",  queries:["luxury penthouse interior golden hour minimal","premium watch macro bokeh dramatic light gold","yacht ocean horizon exclusive cinematic sunset","luxury car interior leather detail bokeh dark"], voiceScripts:["This is what success looks like.","Crafted for those who demand more.","Not for everyone. Just the best.","Luxury is a state of mind."] },
+  tech:     { accent:"#5B8DEF", bgFrom:"#020818", bgTo:"#0a1628", layout:"phone_mockup",audio:"tech",         font:"Space Grotesk",    weight:800, tagFont:"Roboto Mono",   tagWeight:400, projectName:"Dev Portfolio", tagline:"Code. Ship. Repeat.",  handle:"@dev.reel",     queries:["dark neon coding setup dual monitors cyberpunk","programmer focused flow state laptop night dark","abstract code matrix green particles dark","modern tech workspace minimal dark neon blue"], voiceScripts:["Code that shapes the world.","Built different. Shipped faster.","The future runs on your code.","Every bug fixed. Every feature shipped."] },
+  minimal:  { accent:"#E8E8E8", bgFrom:"#050505", bgTo:"#0f0f0f", layout:"fullscreen", audio:"lofi",         font:"Inter",            weight:900, tagFont:"Inter",           tagWeight:300, projectName:"Minimal",       tagline:"Less Is More",        handle:"@minimal.reel", queries:["minimal architecture clean lines dramatic shadow","elegant simple portrait clean light studio","abstract geometric shapes dark minimal","modern interior design minimal white space"],   voiceScripts:["Remove the noise. Keep the truth.","Simplicity is the ultimate sophistication.","Less clutter. More clarity.","Design that breathes."] },
+  surprise: { accent:"#00FF94", bgFrom:"#000a05", bgTo:"#001508", layout:"fullscreen", audio:"aesthetic",    font:"Space Grotesk",    weight:900, tagFont:"Inter",           tagWeight:300, projectName:"Unfiltered",    tagline:"Expect Nothing",      handle:"@reelstudio",   queries:["surreal neon portrait cinematic dark","abstract glowing light trail long exposure dark","futuristic cyberpunk rain neon street cinematic","holographic light prism abstract art dark"], voiceScripts:["Nothing prepared you for this.","Reality is just a setting. Change it.","Beyond imagination. This is now.","Unfiltered. Unscripted. Unstoppable."] },
 };
 
 function detectPreset(msg) {
@@ -573,10 +573,22 @@ async function buildDirectly(userMsg, actions, state, onProgress, onStream) {
     await delay(300);
   }
 
-  const transTypes = ["fade","zoom_in","slide_left","wipe","zoom_out"];
+  // Varied cinematic transitions per preset
+  const transMap = {
+    travel:   ["blur","wipe_up","zoom_in","fade","slide_up"],
+    fashion:  ["wipe","blur","slide_up","fade","wipe_up"],
+    fitness:  ["zoom_in","slide_left","zoom_out","zoom_in","blur"],
+    luxury:   ["fade","blur","wipe","fade","blur"],
+    music:    ["zoom_in","blur","rotate_in","slide_left","zoom_out"],
+    tech:     ["zoom_in","rotate_in","slide_left","blur","zoom_out"],
+    food:     ["fade","wipe","blur","zoom_in","fade"],
+    minimal:  ["fade","blur","wipe_up","fade","blur"],
+    surprise: ["rotate_in","zoom_out","blur","wipe_up","zoom_in"],
+  };
+  const transTypes = transMap[presetKey] || ["blur","fade","zoom_in","wipe_up","slide_left"];
   for (let i = 0; i < slides - 1; i++) {
     tick(`Adding transition ${i+1}`);
-    actions.addTransition(transTypes[i % transTypes.length], i, 0.5);
+    actions.addTransition(transTypes[i % transTypes.length], i, 0.6);
     await delay(100);
   }
 
@@ -586,21 +598,21 @@ async function buildDirectly(userMsg, actions, state, onProgress, onStream) {
   await delay(200);
 
   tick("Styling text");
-  actions.setTextStyle("projectName",  { fontFamily: font,           fontSize: 68,  fontWeight: preset.weight,    color: "#ffffff",               align: "center", yOffset: preset.layout === "fullscreen" ? 700 : 0 });
-  actions.setTextStyle("tagline",      { fontFamily: preset.tagFont,  fontSize: 28,  fontWeight: preset.tagWeight, color: preset.accent,            align: "center", yOffset: preset.layout === "fullscreen" ? 620 : 0 });
-  actions.setTextStyle("description",  { fontFamily: "Inter",         fontSize: 22,  fontWeight: 400,              color: "rgba(255,255,255,0.6)",  align: "center", yOffset: 0 });
-  actions.setTextStyle("handle",       { fontFamily: "Inter",         fontSize: 24,  fontWeight: 600,              color: "rgba(255,255,255,0.8)",  align: "center", yOffset: 0 });
+  const isFS = preset.layout === "fullscreen";
+  actions.setTextStyle("projectName",  { fontFamily: font,           fontSize: 72,  fontWeight: preset.weight,    color: "#ffffff",               align: "center", yOffset: isFS ? 700 : 0 });
+  actions.setTextStyle("tagline",      { fontFamily: preset.tagFont,  fontSize: 28,  fontWeight: preset.tagWeight, color: preset.accent,           align: "center", yOffset: isFS ? 610 : 0 });
+  actions.setTextStyle("description",  { fontFamily: "Inter",         fontSize: 0,   fontWeight: 400,              color: "rgba(255,255,255,0.6)", align: "center", yOffset: 0 });
+  actions.setTextStyle("handle",       { fontFamily: "Inter",         fontSize: 24,  fontWeight: 600,              color: "rgba(255,255,255,0.8)", align: "center", yOffset: 0 });
+  actions.setKenBurns(true);
   await delay(200);
 
-  // Voiceovers via ElevenLabs
-  const scripts = [
+  // Voiceovers — use preset-specific scripts
+  const scripts = preset.voiceScripts || [
     "Pure elegance, one frame at a time.",
-    "Style that speaks without words.",
-    "Where beauty meets intention.",
-    "This is fashion, redefined.",
-    "Timeless. Graceful. Yours.",
     "Every detail tells a story.",
-    "Art you can wear.",
+    "This is what greatness looks like.",
+    "Built for those who demand more.",
+    "Beyond ordinary. This is it.",
   ];
   for (let i = 0; i < slides; i++) {
     tick(`Generating voiceover ${i+1}/${slides}`);
@@ -645,22 +657,33 @@ export async function sendMessage(messages, actions, state = null, onProgress = 
     const toolResults = [];
     let calls = activeMessage.tool_calls || [];
 
-    // ── DSML detection: DeepSeek sometimes outputs raw DSML markup instead of tool_calls ──
+    // ── DSML / bad-output detection ───────────────────────────────
     const isDSML = (msg) => !msg.tool_calls?.length && msg.content && (
-      msg.content.includes("DSML") || msg.content.includes("｜｜") || msg.content.includes("invoke name=")
+      msg.content.includes("DSML") ||
+      msg.content.includes("｜｜") ||
+      msg.content.includes("invoke name=") ||
+      msg.content.includes("<invoke") ||
+      msg.content.includes("tool_calls>") ||
+      msg.content.includes("function_calls>") ||
+      msg.content.includes("add_asset") ||
+      msg.content.includes("add_text")
     );
 
-    // Also detect plain-text "planning" responses (model described instead of building)
-    const isPlainTextNonAction = !calls.length && activeMessage.content && hasEnoughInfo && activeMessage.content.length > 80 && !activeMessage.content.includes("?");
+    const isPlainTextNonAction = !calls.length && activeMessage.content && hasEnoughInfo && activeMessage.content.length > 60 && !activeMessage.content.includes("?");
 
     if (isDSML(activeMessage) || isPlainTextNonAction) {
-      onProgress?.("⟳ Retrying with direct build…");
-      // One LLM retry first
+      onProgress?.("⟳ Retrying…");
       try {
         const retryResponse = await client.chat.completions.create({
           model: "deepseek-chat",
           messages: [
-            { role: "system", content: "You are a video editor. Call the function tools NOW. No text. No markup. Only function_calls." },
+            {
+              role: "system",
+              content: `You are a JSON function-calling video editor. You ONLY respond with function_calls using the provided tools.
+NEVER output text. NEVER output XML. NEVER output DSML. NEVER use add_asset, add_text, or any tag syntax.
+The ONLY valid tools are: ${TOOLS.map(t => t.function.name).join(", ")}.
+Call them now for this request. tool_choice is required.`,
+            },
             { role: "user", content: lastUserMsg },
           ],
           tools: TOOLS,
@@ -670,7 +693,6 @@ export async function sendMessage(messages, actions, state = null, onProgress = 
         calls = activeMessage.tool_calls || [];
       } catch (_) { calls = []; }
 
-      // If still no valid tool calls → use direct build fallback
       if (!calls.length || isDSML(activeMessage)) {
         return await buildDirectly(lastUserMsg, actions, state, onProgress, onStream);
       }
