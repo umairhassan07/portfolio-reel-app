@@ -719,6 +719,16 @@ export async function sendMessage(messages, actions, state = null, onProgress = 
       return { content: cleanContent, toolCalls: toolResults };
     }
 
+    // ── Incomplete build check ────────────────────────────────────
+    // If the LLM called tools but never added images, the build is incomplete.
+    // Auto-complete it using buildDirectly so the user always gets a full reel.
+    const hasImages = toolResults.some(r => ["search_and_add_image","add_slide","update_slide_image"].includes(r.name));
+    const isFullBuildRequest = hasEnoughInfo && !lastUserMsg.toLowerCase().match(/^(change|update|remove|delete|fix|just|only|edit|modify|set|style|undo|redo)/);
+    if (!hasImages && isFullBuildRequest && calls.length > 0) {
+      onProgress?.("⟳ Adding images and completing build…");
+      return await buildDirectly(lastUserMsg, actions, state, onProgress, onStream);
+    }
+
     // Tools were called — generate a plain-text summary (no markup, no DSML)
     if (calls.length > 0 && onStream) {
       try {
