@@ -657,45 +657,18 @@ export async function sendMessage(messages, actions, state = null, onProgress = 
     const toolResults = [];
     let calls = activeMessage.tool_calls || [];
 
-    // ── DSML / bad-output detection ───────────────────────────────
-    const isDSML = (msg) => !msg.tool_calls?.length && msg.content && (
-      msg.content.includes("DSML") ||
-      msg.content.includes("｜｜") ||
-      msg.content.includes("invoke name=") ||
-      msg.content.includes("<invoke") ||
-      msg.content.includes("tool_calls>") ||
-      msg.content.includes("function_calls>") ||
-      msg.content.includes("add_asset") ||
-      msg.content.includes("add_text")
-    );
+    // ── DSML / bad-output detection ──────────────────────────────
+    // Check content for DSML regardless of whether tool_calls also exist
+    const DSML_PATTERNS = ["DSML","｜｜","invoke name=","<invoke","tool_calls>","function_calls>",
+      "add_asset","add_text","add_track","set_font","set_duration","parameter name=","string=\"true\""];
+    const hasDSMLContent = (content) => !!content && DSML_PATTERNS.some(p => content.includes(p));
+    const isDSML = (msg) => !msg.tool_calls?.length && hasDSMLContent(msg.content);
+    const isPlainTextNonAction = !calls.length && activeMessage.content && hasEnoughInfo
+      && activeMessage.content.length > 60 && !activeMessage.content.includes("?");
 
-    const isPlainTextNonAction = !calls.length && activeMessage.content && hasEnoughInfo && activeMessage.content.length > 60 && !activeMessage.content.includes("?");
-
-    if (isDSML(activeMessage) || isPlainTextNonAction) {
-      onProgress?.("⟳ Retrying…");
-      try {
-        const retryResponse = await client.chat.completions.create({
-          model: "deepseek-chat",
-          messages: [
-            {
-              role: "system",
-              content: `You are a JSON function-calling video editor. You ONLY respond with function_calls using the provided tools.
-NEVER output text. NEVER output XML. NEVER output DSML. NEVER use add_asset, add_text, or any tag syntax.
-The ONLY valid tools are: ${TOOLS.map(t => t.function.name).join(", ")}.
-Call them now for this request. tool_choice is required.`,
-            },
-            { role: "user", content: lastUserMsg },
-          ],
-          tools: TOOLS,
-          tool_choice: "required",
-        });
-        activeMessage = retryResponse.choices[0].message;
-        calls = activeMessage.tool_calls || [];
-      } catch (_) { calls = []; }
-
-      if (!calls.length || isDSML(activeMessage)) {
-        return await buildDirectly(lastUserMsg, actions, state, onProgress, onStream);
-      }
+    // If the content is dirty, always go straight to buildDirectly — skip retry entirely
+    if (isDSML(activeMessage) || hasDSMLContent(activeMessage.content) || isPlainTextNonAction) {
+      return await buildDirectly(lastUserMsg, actions, state, onProgress, onStream);
     }
 
     // ── Phase 2: execute tools one-by-one with progress ───────
@@ -730,8 +703,8 @@ Call them now for this request. tool_choice is required.`,
     }
 
     // ── Phase 3: stream the final text response ────────────────
-    // Only stream text if it's real content (not DSML garbage)
-    const cleanContent = activeMessage.content && !isDSML(activeMessage) ? activeMessage.content : null;
+    // Only stream text if content is clean plain text (no DSML regardless of tool_calls)
+    const cleanContent = activeMessage.content && !hasDSMLContent(activeMessage.content) ? activeMessage.content : null;
     if (cleanContent) {
       if (onStream) {
         const words = cleanContent.split(" ");
