@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: portfolio-reel-render-server
+    runtime: node
+    rootDir: render-server
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    # Free plan — 512 MB RAM, shared CPU
+    # Upgrade to Starter ($7/mo) for faster renders & more RAM
