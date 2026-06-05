@@ -419,12 +419,16 @@ Tech:           zoom_in, rotate_in, slide_left
 Luxury:         fade, blur, wipe
 Creative:       rotate_in, zoom_out, blur
 
-━━━ MUSIC MATCHING ━━━
-fitness/energy → "powerful motivational epic" | tech → "electronic tech minimal"
-fashion → "elegant editorial ambient" | travel → "cinematic orchestral adventure"
-food → "warm acoustic pleasant" | music → "deep phonk bass dark"
-luxury → "sophisticated cinematic minimal" | wellness → "calm ambient nature"
-creative → "inspiring electronic uplifting" | neon → "synthwave retrowave neon"
+━━━ MUSIC MATCHING (use EXACT query words for best results) ━━━
+fitness/gym      → "motivational"    (epic rock, hype energy)
+tech/dev/saas    → "tech"            (electronic, house, minimal)
+fashion/style    → "aesthetic"       (soft pop, R&B, editorial)
+travel/cinematic → "cinematic"       (orchestral, dramatic, epic)
+luxury/premium   → "luxury"          (ambient, jazz, sophisticated)
+food/restaurant  → "lofi"            (warm acoustic, calm)
+music/concert    → "phonk"           (trap, drill, dark bass)
+fun/viral/reels  → "pop"             (upbeat, dance, catchy)
+chill/minimal    → "lofi"            (lo-fi hip hop, ambient)
 
 ━━━ VOICEOVER SCRIPTS (emotional, punchy — write like a movie trailer) ━━━
 Each slide: 5-9 words maximum. Start with a VERB or EMOTION word.
