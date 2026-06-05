@@ -20,7 +20,7 @@ export const TOOLS = [
         type: "object",
         properties: {
           image: { type: "string", description: "Filename in public/assets/ e.g. 'photo.png', or full URL" },
-          duration: { type: "number", description: "Duration in seconds. Default 3." },
+          duration: { type: "number", description: "Duration in seconds. Default 2.5. Use 2.5 for fast pacing, 3.5 for slow cinematic." },
         },
         required: ["image"],
       },
@@ -158,7 +158,7 @@ export const TOOLS = [
         type: "object",
         properties: {
           query: { type: "string", description: "Specific visual query e.g. 'developer coding dark screen laptop'" },
-          duration: { type: "number", description: "Slide duration in seconds. Default 3." },
+          duration: { type: "number", description: "Slide duration in seconds. Default 2.5. Use 2.5 for fast/viral pacing." },
         },
         required: ["query"],
       },
@@ -361,9 +361,11 @@ STEP 11 → set_ken_burns { enabled: true }
 
 ⚠️ NO IMAGES = BROKEN. ⚠️ NO MUSIC = INCOMPLETE. ⚠️ NO VOICEOVERS = INCOMPLETE.
 
-━━━ SLIDE COUNTS BY DURATION ━━━
-5s → 2 slides (3s each) | 10s → 3 slides (3s each) | 15s → 4-5 slides
-20s → 5-6 slides | 30s → 7-8 slides | 60s → 14-16 slides
+━━━ SLIDE DURATIONS & COUNTS ━━━
+Each slide = 2.5s. Transitions = 0.6s (overlapping, so net ~1.9s visible per slide).
+5s → 3 slides | 10s → 5 slides | 15s → 7 slides | 20s → 9 slides | 30s → 13 slides
+ALWAYS pass duration: 2.5 to search_and_add_image. ALWAYS add a transition after every slide except the last.
+Transition types to use (vary per reel): zoom_in, zoom_out, blur, wipe_up, slide_up, fade — NEVER use all the same type.
 
 ━━━ ULTRA-CINEMATIC IMAGE QUERIES (be HYPER-SPECIFIC — vague = bad images) ━━━
 developer:  "dark neon coding setup dual monitors cyberpunk" | "programmer focused flow state laptop night" | "abstract code matrix green particles dark"
@@ -532,18 +534,20 @@ function detectPreset(msg) {
 function detectDuration(msg) {
   const m = msg.match(/(\d+)\s*s(?:ec(?:ond)?s?)?/i);
   const sec = m ? parseInt(m[1]) : 15;
-  if (sec <= 5)  return { sec, slides: 2 };
-  if (sec <= 10) return { sec, slides: 3 };
-  if (sec <= 15) return { sec, slides: 4 };
-  if (sec <= 20) return { sec, slides: 5 };
-  return { sec, slides: 7 };
+  // Each slide is ~2.5s visible + 0.6s transition overlap = ~1.9s net
+  // Calculate slides to fill the target duration
+  if (sec <= 5)  return { sec, slides: 3,  slideDur: 2.0 };
+  if (sec <= 10) return { sec, slides: 5,  slideDur: 2.0 };
+  if (sec <= 15) return { sec, slides: 7,  slideDur: 2.5 };
+  if (sec <= 20) return { sec, slides: 9,  slideDur: 2.5 };
+  if (sec <= 30) return { sec, slides: 12, slideDur: 2.5 };
+  return { sec, slides: Math.round(sec / 2.5), slideDur: 2.5 };
 }
 
 async function buildDirectly(userMsg, actions, state, onProgress, onStream) {
   const presetKey = detectPreset(userMsg);
   const preset    = DIRECT_PRESETS[presetKey];
-  const { sec, slides } = detectDuration(userMsg);
-  const slideDur  = +(sec / slides).toFixed(1);
+  const { sec, slides, slideDur } = detectDuration(userMsg);
   const steps     = 6 + slides + (slides - 1) + 4 + slides; // rough total
   let step = 0;
   const tick = (label) => { step++; onProgress?.(`⟳ ${step}/${steps} — ${label}…`); };
@@ -577,23 +581,23 @@ async function buildDirectly(userMsg, actions, state, onProgress, onStream) {
     await delay(300);
   }
 
-  // Varied cinematic transitions per preset
+  // Cinematic transition sequences — zoom_in/out as base, varied per preset
   const transMap = {
-    travel:   ["blur","wipe_up","zoom_in","fade","slide_up"],
-    fashion:  ["wipe","blur","slide_up","fade","wipe_up"],
-    fitness:  ["zoom_in","slide_left","zoom_out","zoom_in","blur"],
-    luxury:   ["fade","blur","wipe","fade","blur"],
-    music:    ["zoom_in","blur","rotate_in","slide_left","zoom_out"],
-    tech:     ["zoom_in","rotate_in","slide_left","blur","zoom_out"],
-    food:     ["fade","wipe","blur","zoom_in","fade"],
-    minimal:  ["fade","blur","wipe_up","fade","blur"],
-    surprise: ["rotate_in","zoom_out","blur","wipe_up","zoom_in"],
+    travel:   ["zoom_in","blur","zoom_out","wipe_up","zoom_in","blur","zoom_out","wipe_up","zoom_in"],
+    fashion:  ["zoom_out","wipe","blur","zoom_in","wipe_up","zoom_out","blur","wipe","zoom_in"],
+    fitness:  ["zoom_in","zoom_out","zoom_in","zoom_out","zoom_in","zoom_out","zoom_in","zoom_out","zoom_in"],
+    luxury:   ["fade","blur","zoom_in","fade","blur","zoom_out","fade","blur","zoom_in"],
+    music:    ["zoom_in","rotate_in","zoom_out","blur","zoom_in","rotate_in","zoom_out","blur","zoom_in"],
+    tech:     ["zoom_in","blur","rotate_in","zoom_out","slide_left","zoom_in","blur","zoom_out","zoom_in"],
+    food:     ["zoom_in","blur","zoom_out","wipe","zoom_in","blur","zoom_out","fade","zoom_in"],
+    minimal:  ["fade","zoom_in","blur","fade","zoom_out","blur","fade","zoom_in","blur"],
+    surprise: ["zoom_out","rotate_in","blur","zoom_in","wipe_up","zoom_out","rotate_in","blur","zoom_in"],
   };
-  const transTypes = transMap[presetKey] || ["blur","fade","zoom_in","wipe_up","slide_left"];
+  const transTypes = transMap[presetKey] || ["zoom_in","blur","zoom_out","wipe_up","zoom_in","blur","zoom_out","fade","zoom_in"];
   for (let i = 0; i < slides - 1; i++) {
     tick(`Adding transition ${i+1}`);
     actions.addTransition(transTypes[i % transTypes.length], i, 0.6);
-    await delay(100);
+    await delay(80);
   }
 
   tick("Finding music");
@@ -784,7 +788,7 @@ async function executeTool(name, args, actions, state) {
   switch (name) {
 
     case "add_slide":
-      actions.addSlide(args.image, args.duration || 3);
+      actions.addSlide(args.image, args.duration || 2.5);
       return `Slide added: ${args.image}`;
 
     case "remove_slide":
@@ -843,7 +847,7 @@ async function executeTool(name, args, actions, state) {
     case "search_and_add_image": {
       const photos = await searchPexels(args.query, 1);
       const photo = photos[0];
-      actions.addSlide(photo.url, args.duration || 3);
+      actions.addSlide(photo.url, args.duration || 2.5);
       return `Added: "${photo.alt}" by ${photo.photographer}`;
     }
 
