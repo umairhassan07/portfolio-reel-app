@@ -746,36 +746,46 @@ Call them now for this request. tool_choice is required.`,
       return { content: cleanContent, toolCalls: toolResults };
     }
 
-    // Tools were called — optionally do a follow-up streaming call for the summary
+    // Tools were called — generate a plain-text summary (no markup, no DSML)
     if (calls.length > 0 && onStream) {
-      const followUp = await client.chat.completions.create({
-        model: "deepseek-chat",
-        stream: true,
-        messages: [
-          { role: "system", content: "You are a concise video editor AI. In ONE sentence, confirm what you just built. No lists. No markdown." },
-          ...messages,
-          { role: "assistant", content: null, tool_calls: calls },
-          ...toolResults.map((r, i) => ({
-            role: "tool",
-            tool_call_id: calls[i].id,
-            content: r.result,
-          })),
-        ],
-      });
+      try {
+        const followUp = await client.chat.completions.create({
+          model: "deepseek-chat",
+          stream: true,
+          messages: [
+            {
+              role: "system",
+              content: "You are a concise video editor assistant. Reply in ONE plain sentence summarising what was built. Output ONLY plain text — no XML, no tags, no DSML, no markdown, no angle brackets, no tool calls.",
+            },
+            { role: "user", content: `Summarise this reel build in one sentence: ${toolResults.map(r => r.label).join(", ")}` },
+          ],
+        });
 
-      let streamed = "";
-      for await (const chunk of followUp) {
-        const delta = chunk.choices[0]?.delta?.content || "";
-        if (delta) {
+        let streamed = "";
+        for await (const chunk of followUp) {
+          const delta = chunk.choices[0]?.delta?.content || "";
+          if (!delta) continue;
+          // Stop streaming the moment any DSML / tag garbage appears
+          if (streamed.includes("｜｜") || streamed.includes("<invoke") || streamed.includes("DSML")) break;
           streamed += delta;
-          onStream(streamed, false);
+          // Strip any stray tag characters before showing
+          const safe = streamed.replace(/<[^>]*>/g, "").replace(/[｜]{2}[^｜]*[｜]{2}/g, "");
+          onStream(safe, false);
         }
-      }
-      onStream(streamed, true);
-      return { content: streamed, toolCalls: toolResults };
+        const safe = streamed.replace(/<[^>]*>/g, "").replace(/[｜]{2}[^｜]*[｜]{2}/g, "");
+        if (safe.trim()) {
+          onStream(safe, true);
+          return { content: safe, toolCalls: toolResults };
+        }
+      } catch (_) {}
+
+      // Fallback: build summary from tool labels without LLM
+      const summary = `Built your reel — ${toolResults.length} steps completed.`;
+      onStream(summary, true);
+      return { content: summary, toolCalls: toolResults };
     }
 
-    return { content: message.content || "", toolCalls: toolResults };
+    return { content: "", toolCalls: toolResults };
 
   } catch (err) {
     console.error("[DeepSeek Error]", err);
