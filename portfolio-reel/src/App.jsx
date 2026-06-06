@@ -230,7 +230,7 @@ const SIDEBAR_ITEMS = [
 ];
 
 // ── AI Image Generate Panel ────────────────────────────────────
-function GeneratePanel({ onAddSlide }) {
+function GeneratePanel({ onAddSlide, onOpenCanvas }) {
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState("cinematic");
   const [refImage, setRefImage] = useState(null);
@@ -393,7 +393,8 @@ function GeneratePanel({ onAddSlide }) {
                   <img
                     src={r.url}
                     alt={`Generated ${i + 1}`}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", opacity: r.loaded ? 1 : 0, transition: "opacity 0.4s" }}
+                    onClick={() => r.loaded && onOpenCanvas?.({ url: r.url, prompt: r.prompt })}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", opacity: r.loaded ? 1 : 0, transition: "opacity 0.4s", cursor: r.loaded ? "zoom-in" : "default" }}
                     onLoad={() => markLoaded(r.url)}
                     onError={() => markError(r.url)}
                   />
@@ -431,7 +432,7 @@ function GeneratePanel({ onAddSlide }) {
   );
 }
 
-function CapCutSidebar({ slides, audio, selectedSlide, setSelectedSlide, addSlide, setAudio, addTransition, setText, setTextStyle, setTheme, resolveImage, fileInputRef, addLocalFiles, state, onAddPexelsSlide, onAddSticker, onAddTextLayer, onApplyTemplate, onSetAudioVolume, onSetKenBurns, onRemoveSticker, onUpdateSticker, onRemoveTextLayer, onUpdateTextLayer, setCaption, reorderSlides, addVoiceover, removeVoiceover, updateVoiceover }) {
+function CapCutSidebar({ slides, audio, selectedSlide, setSelectedSlide, addSlide, setAudio, addTransition, setText, setTextStyle, setTheme, resolveImage, fileInputRef, addLocalFiles, state, onAddPexelsSlide, onAddSticker, onAddTextLayer, onApplyTemplate, onSetAudioVolume, onSetKenBurns, onRemoveSticker, onUpdateSticker, onRemoveTextLayer, onUpdateTextLayer, setCaption, reorderSlides, addVoiceover, removeVoiceover, updateVoiceover, onOpenCanvas }) {
   const [activePanel, setActivePanel] = useState("media");
   const audioElRef = useRef(null);
   const [playingAudio, setPlayingAudio] = useState(null);
@@ -501,7 +502,7 @@ function CapCutSidebar({ slides, audio, selectedSlide, setSelectedSlide, addSlid
           <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
 
             {activePanel === "generate" && (
-              <GeneratePanel onAddSlide={(url) => onAddPexelsSlide(url)} />
+              <GeneratePanel onAddSlide={(url) => onAddPexelsSlide(url)} onOpenCanvas={onOpenCanvas} />
             )}
 
             {activePanel === "media" && (
@@ -1522,6 +1523,120 @@ function Timeline({ slides, transitions, onSelectSlide, selectedSlide, totalDura
   );
 }
 
+// ── Generate Canvas ────────────────────────────────────────────
+function GenerateCanvas({ image, onClose, onAddToReel }) {
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(null);
+  const canvasRef = useRef(null);
+
+  const clampZoom = v => Math.min(5, Math.max(0.2, v));
+
+  const onWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setZoom(z => clampZoom(z + delta));
+  };
+
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const onMouseDown = (e) => {
+    setDragging(true);
+    setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+  };
+
+  const onMouseMove = (e) => {
+    if (!dragging || !dragStart) return;
+    setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+  };
+
+  const onMouseUp = () => { setDragging(false); setDragStart(null); };
+
+  const download = async () => {
+    try {
+      const res = await fetch(image.url);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "generated-image.jpg";
+      a.click();
+    } catch {
+      window.open(image.url, "_blank");
+    }
+  };
+
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#04040a", overflow: "hidden", position: "relative" }}>
+
+      {/* Toolbar */}
+      <div style={{ height: 44, flexShrink: 0, background: "#0a0a14", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", padding: "0 14px", gap: 8 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>✦ Canvas</span>
+        <div style={{ flex: 1, fontSize: 9, color: "rgba(255,255,255,0.25)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{image.prompt}</div>
+
+        {/* Zoom controls */}
+        <button onClick={() => setZoom(z => clampZoom(z - 0.2))} style={canvasBtn}>−</button>
+        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", minWidth: 36, textAlign: "center" }}>{Math.round(zoom * 100)}%</span>
+        <button onClick={() => setZoom(z => clampZoom(z + 0.2))} style={canvasBtn}>+</button>
+        <button onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }} style={{ ...canvasBtn, fontSize: 9 }}>Reset</button>
+
+        <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.1)", margin: "0 4px" }} />
+
+        {/* Add to reel */}
+        <button onClick={() => onAddToReel(image.url)} style={{ background: ACC, border: "none", borderRadius: 7, color: "#fff", fontSize: 10, fontWeight: 700, padding: "6px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+          + Add to Reel
+        </button>
+
+        {/* Download */}
+        <button onClick={download} style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, color: "rgba(255,255,255,0.7)", fontSize: 10, fontWeight: 600, padding: "6px 12px", cursor: "pointer" }}>
+          ⬇ Download
+        </button>
+
+        {/* Close */}
+        <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, color: "rgba(255,255,255,0.5)", fontSize: 12, width: 28, height: 28, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+      </div>
+
+      {/* Canvas area */}
+      <div
+        ref={canvasRef}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
+        style={{ flex: 1, overflow: "hidden", cursor: dragging ? "grabbing" : "grab", position: "relative", background: "radial-gradient(ellipse at center, #0d0d1a 0%, #04040a 100%)" }}
+      >
+        {/* Grid */}
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px)", backgroundSize: "40px 40px", pointerEvents: "none" }} />
+
+        {/* Image */}
+        <div style={{ position: "absolute", top: "50%", left: "50%", transform: `translate(calc(-50% + ${pan.x}px), calc(-50% + ${pan.y}px)) scale(${zoom})`, transformOrigin: "center", transition: dragging ? "none" : "transform 0.05s", userSelect: "none" }}>
+          <img
+            src={image.url}
+            draggable={false}
+            style={{ maxWidth: 400, maxHeight: 700, width: "auto", height: "auto", display: "block", borderRadius: 12, boxShadow: `0 40px 120px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.08), 0 0 60px ${ACC}22` }}
+          />
+        </div>
+
+        {/* Zoom hint */}
+        <div style={{ position: "absolute", bottom: 12, right: 12, fontSize: 9, color: "rgba(255,255,255,0.2)", background: "rgba(0,0,0,0.4)", borderRadius: 5, padding: "4px 8px" }}>
+          Scroll to zoom · Drag to pan
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const canvasBtn = {
+  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: 6, color: "rgba(255,255,255,0.6)", fontSize: 13, width: 26, height: 26,
+  cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+};
+
 // ── Main App ───────────────────────────────────────────────────
 export default function App() {
   const {
@@ -1541,6 +1656,7 @@ export default function App() {
   const [exportOpen, setExportOpen] = useState(false);
   const [fullscreenPreview, setFullscreenPreview] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [canvasImage, setCanvasImage] = useState(null); // { url, prompt } — opens canvas mode
 
   // Chat panel drag-to-resize
   const dragRef = useRef(null);
@@ -1703,6 +1819,7 @@ export default function App() {
 
         {/* CapCut-style icon sidebar + sliding panel */}
         <CapCutSidebar
+          onOpenCanvas={img => setCanvasImage(img)}
           slides={state.slides}
           audio={state.audio}
           selectedSlide={selectedSlide}
@@ -1734,7 +1851,17 @@ export default function App() {
           updateVoiceover={updateVoiceover}
         />
 
+        {/* ── Canvas Mode (replaces preview + timeline) ── */}
+        {canvasImage && (
+          <GenerateCanvas
+            image={canvasImage}
+            onClose={() => setCanvasImage(null)}
+            onAddToReel={(url) => { addSlide(url, 2.5); setCanvasImage(null); }}
+          />
+        )}
+
         {/* ── Premium Preview ── */}
+        {!canvasImage && <>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#06060e", overflow: "hidden", minHeight: 0, position: "relative" }}>
 
           {/* Canvas stage */}
@@ -1847,6 +1974,8 @@ export default function App() {
             </div>
           </div>
         </div>
+
+        </>}
 
         {/* AI Chat Panel with drag-to-resize */}
         {chatOpen && (
