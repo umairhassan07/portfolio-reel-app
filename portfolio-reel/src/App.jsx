@@ -230,13 +230,12 @@ const SIDEBAR_ITEMS = [
 ];
 
 // ── AI Image Generate Panel ────────────────────────────────────
-function GeneratePanel({ onAddSlide, onOpenCanvas }) {
+function GeneratePanel({ onAddSlide, onOpenCanvas, results, setResults }) {
   const [prompt, setPrompt] = useState("");
-  const [style, setStyle] = useState("cinematic");
+  const [style, setStyle] = useState("tech");
   const [refImage, setRefImage] = useState(null);
   const [refDesc, setRefDesc] = useState("");
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState([]);
   const [adding, setAdding] = useState(null);
   const refInputRef = useRef(null);
 
@@ -432,8 +431,7 @@ function GeneratePanel({ onAddSlide, onOpenCanvas }) {
   );
 }
 
-function CapCutSidebar({ slides, audio, selectedSlide, setSelectedSlide, addSlide, setAudio, addTransition, setText, setTextStyle, setTheme, resolveImage, fileInputRef, addLocalFiles, state, onAddPexelsSlide, onAddSticker, onAddTextLayer, onApplyTemplate, onSetAudioVolume, onSetKenBurns, onRemoveSticker, onUpdateSticker, onRemoveTextLayer, onUpdateTextLayer, setCaption, reorderSlides, addVoiceover, removeVoiceover, updateVoiceover, onOpenCanvas }) {
-  const [activePanel, setActivePanel] = useState("media");
+function CapCutSidebar({ slides, audio, selectedSlide, setSelectedSlide, addSlide, setAudio, addTransition, setText, setTextStyle, setTheme, resolveImage, fileInputRef, addLocalFiles, state, onAddPexelsSlide, onAddSticker, onAddTextLayer, onApplyTemplate, onSetAudioVolume, onSetKenBurns, onRemoveSticker, onUpdateSticker, onRemoveTextLayer, onUpdateTextLayer, setCaption, reorderSlides, addVoiceover, removeVoiceover, updateVoiceover, onOpenCanvas, activePanel, setActivePanel, generateResults, setGenerateResults }) {
   const audioElRef = useRef(null);
   const [playingAudio, setPlayingAudio] = useState(null);
   const [audioFiles, setAudioFiles] = useState([]);
@@ -502,7 +500,7 @@ function CapCutSidebar({ slides, audio, selectedSlide, setSelectedSlide, addSlid
           <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
 
             {activePanel === "generate" && (
-              <GeneratePanel onAddSlide={(url) => onAddPexelsSlide(url)} onOpenCanvas={onOpenCanvas} />
+              <GeneratePanel onAddSlide={(url) => onAddPexelsSlide(url)} onOpenCanvas={onOpenCanvas} results={generateResults} setResults={setGenerateResults} />
             )}
 
             {activePanel === "media" && (
@@ -1523,7 +1521,149 @@ function Timeline({ slides, transitions, onSelectSlide, selectedSlide, totalDura
   );
 }
 
-// ── Generate Canvas ────────────────────────────────────────────
+// ── Generate Center Canvas (replaces preview+timeline when Generate tab open) ─
+function GenerateCenterCanvas({ results, selected, setSelected, onAddToReel, accent }) {
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(null);
+  const [adding, setAdding] = useState(false);
+  const canvasRef = useRef(null);
+
+  // Reset zoom/pan when image changes
+  useEffect(() => { setZoom(1); setPan({ x: 0, y: 0 }); }, [selected?.url]);
+
+  // Auto-select first loaded image
+  useEffect(() => {
+    if (!selected) {
+      const first = results.find(r => r.loaded);
+      if (first) setSelected(first);
+    }
+  }, [results]);
+
+  const clampZoom = v => Math.min(8, Math.max(0.15, v));
+
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    const onWheel = (e) => { e.preventDefault(); setZoom(z => clampZoom(z + (e.deltaY > 0 ? -0.12 : 0.12))); };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const download = async () => {
+    if (!selected) return;
+    try {
+      const res = await fetch(selected.url);
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "generated.jpg";
+      a.click();
+    } catch { window.open(selected.url, "_blank"); }
+  };
+
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#05050c", overflow: "hidden" }}>
+
+      {/* Top toolbar */}
+      <div style={{ height: 40, flexShrink: 0, background: "#0a0a14", borderBottom: "1px solid rgba(255,255,255,0.07)", display: "flex", alignItems: "center", padding: "0 14px", gap: 8 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, background: `linear-gradient(135deg, ${accent}, #9c56ff)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>✦ Generate</span>
+        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)" }}>{results.filter(r=>r.loaded).length} / {results.length} ready</span>
+        <div style={{ flex: 1 }} />
+        {selected && <>
+          <button onClick={() => setZoom(z => clampZoom(z - 0.25))} style={genBtn}>−</button>
+          <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", minWidth: 34, textAlign: "center" }}>{Math.round(zoom * 100)}%</span>
+          <button onClick={() => setZoom(z => clampZoom(z + 0.25))} style={genBtn}>+</button>
+          <button onClick={() => { setZoom(1); setPan({ x:0, y:0 }); }} style={{ ...genBtn, fontSize: 9, padding: "0 8px", width: "auto" }}>Fit</button>
+          <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.1)" }} />
+          <button onClick={download} style={{ ...genBtn, fontSize: 9, padding: "0 10px", width: "auto", color: "rgba(255,255,255,0.6)" }}>⬇ Save</button>
+          <button onClick={async () => { setAdding(true); await onAddToReel(selected.url); setAdding(false); }} style={{ background: accent, border: "none", borderRadius: 7, color: "#fff", fontSize: 10, fontWeight: 700, padding: "5px 14px", cursor: "pointer", boxShadow: `0 2px 12px ${accent}55` }}>
+            {adding ? "Adding…" : "+ Add to Reel"}
+          </button>
+        </>}
+      </div>
+
+      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+
+        {/* Left: thumbnail strip */}
+        <div style={{ width: 100, flexShrink: 0, background: "#08080f", borderRight: "1px solid rgba(255,255,255,0.06)", overflowY: "auto", display: "flex", flexDirection: "column", gap: 6, padding: 8, scrollbarWidth: "thin", scrollbarColor: `${accent}33 transparent` }}>
+          {results.length === 0 && (
+            <div style={{ color: "rgba(255,255,255,0.15)", fontSize: 9, textAlign: "center", marginTop: 20, lineHeight: 1.7 }}>
+              Use the Generate panel on the left to create images
+            </div>
+          )}
+          {results.map((r, i) => (
+            <div
+              key={i}
+              onClick={() => r.loaded && setSelected(r)}
+              style={{ position: "relative", borderRadius: 8, overflow: "hidden", aspectRatio: "9/16", background: "#0e0e1a", border: `2px solid ${selected?.url === r.url ? accent : "rgba(255,255,255,0.06)"}`, cursor: r.loaded ? "pointer" : "default", flexShrink: 0, boxShadow: selected?.url === r.url ? `0 0 12px ${accent}66` : "none", transition: "all 0.15s" }}
+            >
+              {!r.loaded && !r.error && (
+                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: 16, height: 16, border: `2px solid ${accent}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.9s linear infinite" }} />
+                </div>
+              )}
+              {r.error && <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>⚠️</div>}
+              {r.url && <img src={r.url} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: r.loaded ? 1 : 0, transition: "opacity 0.3s" }} onLoad={() => {}} />}
+              {r.loaded && selected?.url === r.url && (
+                <div style={{ position: "absolute", bottom: 3, right: 3, width: 12, height: 12, borderRadius: "50%", background: accent, border: "2px solid #fff" }} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Right: main canvas */}
+        <div
+          ref={canvasRef}
+          onMouseDown={e => { setDragging(true); setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y }); }}
+          onMouseMove={e => { if (!dragging || !dragStart) return; setPan({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }); }}
+          onMouseUp={() => { setDragging(false); setDragStart(null); }}
+          onMouseLeave={() => { setDragging(false); setDragStart(null); }}
+          style={{ flex: 1, overflow: "hidden", cursor: dragging ? "grabbing" : selected ? "grab" : "default", position: "relative", background: "radial-gradient(ellipse at 50% 45%, #0d0d20 0%, #05050c 100%)" }}
+        >
+          {/* Grid */}
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px)", backgroundSize: "48px 48px", pointerEvents: "none" }} />
+
+          {selected ? (
+            <div style={{ position: "absolute", top: "50%", left: "50%", transform: `translate(calc(-50% + ${pan.x}px), calc(-50% + ${pan.y}px)) scale(${zoom})`, transformOrigin: "center", userSelect: "none" }}>
+              <img
+                src={selected.url}
+                draggable={false}
+                style={{ width: 360, height: "auto", display: "block", borderRadius: 14, boxShadow: `0 48px 120px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.07), 0 0 80px ${accent}18` }}
+              />
+              {/* Prompt label */}
+              <div style={{ marginTop: 12, fontSize: 9, color: "rgba(255,255,255,0.3)", textAlign: "center", maxWidth: 360, lineHeight: 1.5, padding: "0 8px" }}>
+                {selected.prompt?.split(",").slice(0,3).join(" ·")}
+              </div>
+            </div>
+          ) : (
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14 }}>
+              <div style={{ fontSize: 40, opacity: 0.15 }}>✦</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.2)", fontWeight: 600 }}>
+                {results.length === 0 ? "Enter a prompt and click Generate" : "Select an image from the strip"}
+              </div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.1)" }}>
+                {results.length > 0 ? `${results.filter(r=>r.loaded).length} of ${results.length} images ready` : "Images appear here"}
+              </div>
+            </div>
+          )}
+
+          {/* Bottom hint */}
+          {selected && (
+            <div style={{ position: "absolute", bottom: 10, right: 12, fontSize: 8, color: "rgba(255,255,255,0.18)", background: "rgba(0,0,0,0.4)", borderRadius: 4, padding: "3px 7px" }}>
+              Scroll to zoom · Drag to pan
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const genBtn = { width: 26, height: 26, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: "rgba(255,255,255,0.5)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" };
+
+// ── Generate Canvas (legacy lightbox) ──────────────────────────
 function GenerateCanvas({ image, onClose, onAddToReel }) {
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -1656,7 +1796,10 @@ export default function App() {
   const [exportOpen, setExportOpen] = useState(false);
   const [fullscreenPreview, setFullscreenPreview] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const [canvasImage, setCanvasImage] = useState(null); // { url, prompt } — opens canvas mode
+  const [canvasImage, setCanvasImage] = useState(null);
+  const [activeSidebarPanel, setActiveSidebarPanel] = useState("media");
+  const [generateResults, setGenerateResults] = useState([]);
+  const [selectedGenImage, setSelectedGenImage] = useState(null); // image selected in generate canvas
 
   // Chat panel drag-to-resize
   const dragRef = useRef(null);
@@ -1819,7 +1962,11 @@ export default function App() {
 
         {/* CapCut-style icon sidebar + sliding panel */}
         <CapCutSidebar
-          onOpenCanvas={img => setCanvasImage(img)}
+          activePanel={activeSidebarPanel}
+          setActivePanel={setActiveSidebarPanel}
+          generateResults={generateResults}
+          setGenerateResults={setGenerateResults}
+          onOpenCanvas={img => setSelectedGenImage(img)}
           slides={state.slides}
           audio={state.audio}
           selectedSlide={selectedSlide}
@@ -1851,17 +1998,19 @@ export default function App() {
           updateVoiceover={updateVoiceover}
         />
 
-        {/* ── Canvas Mode (replaces preview + timeline) ── */}
-        {canvasImage && (
-          <GenerateCanvas
-            image={canvasImage}
-            onClose={() => setCanvasImage(null)}
-            onAddToReel={(url) => { addSlide(url, 2.5); setCanvasImage(null); }}
+        {/* ── Generate Center Canvas (when Generate tab active) ── */}
+        {activeSidebarPanel === "generate" && (
+          <GenerateCenterCanvas
+            results={generateResults}
+            selected={selectedGenImage}
+            setSelected={setSelectedGenImage}
+            onAddToReel={(url) => { addSlide(url, 2.5); }}
+            accent={ACC}
           />
         )}
 
-        {/* ── Premium Preview ── */}
-        {!canvasImage && <>
+        {/* ── Normal Preview + Timeline ── */}
+        {activeSidebarPanel !== "generate" && <>
         <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#06060e", overflow: "hidden", minHeight: 0, position: "relative" }}>
 
           {/* Canvas stage */}
