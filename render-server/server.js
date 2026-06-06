@@ -143,67 +143,52 @@ app.get("/api/download", (req, res) => {
 });
 
 // ── POST /api/generate-image ──────────────────────────────────
-// Proxies HF Inference API — no timeout issues unlike Vercel Hobby
-const HF_MODELS = [
-  "black-forest-labs/FLUX.1-schnell",
-  "stabilityai/stable-diffusion-xl-base-1.0",
-];
-
+// Uses Qwen Wanx image generation (fast, cheap ~$0.008/image)
 app.post("/api/generate-image", async (req, res) => {
   const { prompt, seed = Math.floor(Math.random() * 99999) } = req.body;
   if (!prompt) return res.status(400).json({ error: "prompt required" });
 
-  const token = process.env.HF_TOKEN;
-  if (!token) return res.status(500).json({ error: "HF_TOKEN not set on Railway" });
+  const apiKey = process.env.QWEN_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "QWEN_API_KEY not set on Railway" });
 
-  let lastError = "";
+  try {
+    // Qwen Wanx — OpenAI-compatible endpoint
+    const response = await fetch("https://dashscope.aliyuncs.com/compatible-mode/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "wanx2.1-t2i-turbo",
+        prompt,
+        n: 1,
+        size: "576*1024",   // 9:16 portrait — perfect for reels
+        seed,
+      }),
+    });
 
-  for (const model of HF_MODELS) {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 90000); // 90s timeout
-
-      const hfRes = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-          "x-wait-for-model": "true",
-        },
-        body: JSON.stringify({
-          inputs: prompt,
-          parameters: {
-            seed,
-            width: 576,
-            height: 1024,
-            num_inference_steps: model.includes("FLUX") ? 4 : 20,
-            guidance_scale: model.includes("FLUX") ? 0 : 7.5,
-          },
-        }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeout);
-
-      if (!hfRes.ok) {
-        const text = await hfRes.text();
-        lastError = `${model}: ${hfRes.status} — ${text.slice(0, 200)}`;
-        console.error("[generate-image]", lastError);
-        continue;
-      }
-
-      const buffer = await hfRes.arrayBuffer();
-      const base64 = Buffer.from(buffer).toString("base64");
-      const contentType = hfRes.headers.get("content-type") || "image/jpeg";
-
-      return res.json({ image: `data:${contentType};base64,${base64}`, model, seed });
-    } catch (err) {
-      lastError = `${model}: ${err.message}`;
-      console.error("[generate-image]", lastError);
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("[generate-image] Qwen error:", response.status, text);
+      return res.status(response.status).json({ error: `Qwen API error: ${text.slice(0, 300)}` });
     }
-  }
 
-  return res.status(500).json({ error: `All models failed. Last: ${lastError}` });
+    const data = await response.json();
+    const imageUrl = data?.data?.[0]?.url;
+    if (!imageUrl) return res.status(500).json({ error: "No image URL in response", raw: data });
+
+    // Fetch the image and convert to base64 so the browser can display it
+    const imgRes = await fetch(imageUrl);
+    const buffer = await imgRes.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    const contentType = imgRes.headers.get("content-type") || "image/jpeg";
+
+    return res.json({ image: `data:${contentType};base64,${base64}`, seed });
+  } catch (err) {
+    console.error("[generate-image] Error:", err.message);
+    return res.status(500).json({ error: err.message });
+  }
 });
 
 app.listen(PORT, () => {
