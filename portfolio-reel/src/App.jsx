@@ -259,17 +259,22 @@ function GeneratePanel({ onAddSlide }) {
     try {
       const { generateImage, buildReferencePrompt } = await import("./ai/imageGen.js");
       const fullPrompt = buildReferencePrompt(prompt, refDesc);
-      // Generate 2 variations with different seeds
-      const variations = await Promise.all([
-        generateImage({ prompt: fullPrompt, style, width: 768, height: 1344 }),
-        generateImage({ prompt: fullPrompt, style, width: 768, height: 1344 }),
-      ]);
-      setResults(prev => [...variations, ...prev].slice(0, 12));
+      // Build 2 URL entries immediately — images load in background
+      const variations = [
+        await generateImage({ prompt: fullPrompt, style, width: 768, height: 1344 }),
+        await generateImage({ prompt: fullPrompt, style, width: 768, height: 1344 }),
+      ];
+      // Add as "loading" entries so skeleton shows immediately
+      const entries = variations.map(v => ({ ...v, loaded: false, error: false }));
+      setResults(prev => [...entries, ...prev].slice(0, 12));
     } catch (e) {
       console.error(e);
     }
     setLoading(false);
   };
+
+  const markLoaded = (url) => setResults(prev => prev.map(r => r.url === url ? { ...r, loaded: true } : r));
+  const markError  = (url) => setResults(prev => prev.map(r => r.url === url ? { ...r, error: true } : r));
 
   const handleRef = (e) => {
     const file = e.target.files[0];
@@ -360,29 +365,53 @@ function GeneratePanel({ onAddSlide }) {
         {/* Results grid */}
         {results.length > 0 && (
           <div>
-            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Generated ({results.length})</div>
+            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>
+              Generated ({results.filter(r => r.loaded).length}/{results.length})
+            </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
               {results.map((r, i) => (
-                <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden", background: "#0a0a14", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div key={`${r.url}-${i}`} style={{ position: "relative", borderRadius: 8, overflow: "hidden", background: "#0a0a14", border: `1px solid ${r.loaded ? "rgba(108,99,255,0.3)" : "rgba(255,255,255,0.07)"}`, aspectRatio: "9/16" }}>
+
+                  {/* Loading skeleton */}
+                  {!r.loaded && !r.error && (
+                    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                      <div style={{ width: 28, height: 28, border: `2px solid ${ACC}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.9s linear infinite" }} />
+                      <span style={{ fontSize: 8, color: "rgba(255,255,255,0.3)", textAlign: "center", padding: "0 8px", lineHeight: 1.5 }}>Generating…<br/>~15-30s</span>
+                    </div>
+                  )}
+
+                  {/* Error state */}
+                  {r.error && (
+                    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                      <span style={{ fontSize: 18 }}>⚠️</span>
+                      <span style={{ fontSize: 8, color: "rgba(255,255,255,0.3)" }}>Failed to load</span>
+                      <button onClick={() => markError(r.url)} style={{ fontSize: 8, padding: "3px 8px", borderRadius: 4, background: "rgba(255,255,255,0.08)", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer" }}>Retry</button>
+                    </div>
+                  )}
+
+                  {/* Actual image — always in DOM to trigger load */}
                   <img
                     src={r.url}
                     alt={`Generated ${i + 1}`}
-                    style={{ width: "100%", aspectRatio: "9/16", objectFit: "cover", display: "block" }}
-                    loading="lazy"
-                    onError={e => { e.target.style.display = "none"; }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", opacity: r.loaded ? 1 : 0, transition: "opacity 0.4s" }}
+                    onLoad={() => markLoaded(r.url)}
+                    onError={() => markError(r.url)}
                   />
-                  {/* Overlay actions */}
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%)", opacity: 0, transition: "opacity 0.2s" }}
-                    onMouseEnter={e => e.currentTarget.style.opacity = 1}
-                    onMouseLeave={e => e.currentTarget.style.opacity = 0}
-                  >
-                    <button
-                      onClick={async () => { setAdding(i); await onAddSlide(r.url); setAdding(null); }}
-                      style={{ position: "absolute", bottom: 6, left: "50%", transform: "translateX(-50%)", background: ACC, border: "none", borderRadius: 6, color: "#fff", fontSize: 9, fontWeight: 700, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap" }}
+
+                  {/* Add to reel overlay — only when loaded */}
+                  {r.loaded && (
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 55%)", display: "flex", alignItems: "flex-end", justifyContent: "center", padding: "0 0 8px", opacity: 0, transition: "opacity 0.2s" }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                      onMouseLeave={e => e.currentTarget.style.opacity = 0}
                     >
-                      {adding === i ? "Adding…" : "+ Add to Reel"}
-                    </button>
-                  </div>
+                      <button
+                        onClick={async () => { setAdding(i); await onAddSlide(r.url); setAdding(null); }}
+                        style={{ background: ACC, border: "none", borderRadius: 6, color: "#fff", fontSize: 9, fontWeight: 700, padding: "5px 12px", cursor: "pointer", whiteSpace: "nowrap", boxShadow: `0 2px 12px ${ACC}66` }}
+                      >
+                        {adding === i ? "Adding…" : "+ Add to Reel"}
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
