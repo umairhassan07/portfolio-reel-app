@@ -1050,16 +1050,23 @@ const capInputStyle = { width: "100%", background: "rgba(255,255,255,0.05)", bor
 
 // ── Audio Tab with Trending Categories ────────────────────────
 function AudioTab({ audio, setAudio, audioInputRef, addAudioFiles, allAudioFiles, playingAudio, togglePlay, audioVolume, onSetAudioVolume }) {
-  const [trendingHints, setTrendingHints] = useState({});
   const [expandedCat, setExpandedCat] = useState(null);
+  const [catTracks, setCatTracks] = useState({});   // categoryId → track[]
+  const [loadingCat, setLoadingCat] = useState(null);
 
-  useEffect(() => {
-    // Load Spotify trending hints for each category
-    TRENDING_CATEGORIES.forEach(async (cat) => {
-      const names = await getTrendingNames(cat.id === "tech" ? "electronic tech" : cat.id, 3);
-      if (names.length) setTrendingHints((prev) => ({ ...prev, [cat.id]: names }));
-    });
-  }, []);
+  const expandCategory = async (catId) => {
+    const next = expandedCat === catId ? null : catId;
+    setExpandedCat(next);
+    if (next && !catTracks[next]) {
+      setLoadingCat(next);
+      const { fetchCategoryTracks } = await import("./ai/trendingAudio.js");
+      const tracks = await fetchCategoryTracks(next, 6);
+      setCatTracks(prev => ({ ...prev, [next]: tracks }));
+      setLoadingCat(null);
+    }
+  };
+
+  useEffect(() => {}, []);
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -1106,7 +1113,7 @@ function AudioTab({ audio, setAudio, audioInputRef, addAudioFiles, allAudioFiles
           <div key={cat.id} style={{ marginBottom: 6, borderRadius: 10, overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)" }}>
             {/* Category header */}
             <div
-              onClick={() => setExpandedCat(expandedCat === cat.id ? null : cat.id)}
+              onClick={() => expandCategory(cat.id)}
               style={{ background: cat.gradient, padding: "10px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}
             >
               <div style={{ flex: 1 }}>
@@ -1119,25 +1126,40 @@ function AudioTab({ audio, setAudio, audioInputRef, addAudioFiles, allAudioFiles
             {/* Expanded tracks */}
             {expandedCat === cat.id && (
               <div style={{ background: "rgba(0,0,0,0.3)", padding: "6px 8px" }}>
-                {/* Spotify trending hints */}
-                {(trendingHints[cat.id] || cat.spotifyHints).slice(0, 3).map((hint, i) => (
+                {/* Spotify-style hints */}
+                {(cat.spotifyHints || []).slice(0, 3).map((hint, i) => (
                   <div key={i} style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", padding: "2px 0", display: "flex", alignItems: "center", gap: 4 }}>
                     <span style={{ color: "#1DB954", fontSize: 8 }}>♫</span> {hint}
                   </div>
                 ))}
                 <div style={{ height: 6 }} />
-                {/* Royalty-free tracks */}
-                {cat.tracks.map((track, i) => (
+                {/* Loading state */}
+                {loadingCat === cat.id && (
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", padding: "8px 0", textAlign: "center" }}>
+                    ⟳ Loading tracks…
+                  </div>
+                )}
+                {/* Live tracks from Jamendo */}
+                {(catTracks[cat.id] || []).map((track, i) => (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 6px", borderRadius: 6, marginBottom: 3, background: audio === track.url ? `${cat.color}22` : "rgba(255,255,255,0.03)", border: `1px solid ${audio === track.url ? `${cat.color}55` : "rgba(255,255,255,0.05)"}` }}>
                     <button onClick={() => togglePlay(track.url, track.title)} style={{ width: 24, height: 24, borderRadius: "50%", background: playingAudio === track.title ? cat.color : "rgba(255,255,255,0.1)", border: "none", color: "#fff", cursor: "pointer", fontSize: 9, flexShrink: 0 }}>
                       {playingAudio === track.title ? "⏸" : "▶"}
                     </button>
-                    <div style={{ flex: 1, fontSize: 10, color: "#fff" }}>{track.title}</div>
-                    <button onClick={() => setAudio(audio === track.url ? null : track.url)} style={{ fontSize: 9, padding: "3px 7px", borderRadius: 4, border: "none", cursor: "pointer", fontWeight: 600, background: audio === track.url ? cat.color : "rgba(255,255,255,0.1)", color: audio === track.url ? "#000" : "rgba(255,255,255,0.5)" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 10, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{track.title}</div>
+                      {track.artist && <div style={{ fontSize: 8, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>{track.artist}</div>}
+                    </div>
+                    <button onClick={() => setAudio(audio === track.url ? null : track.url)} style={{ fontSize: 9, padding: "3px 7px", borderRadius: 4, border: "none", cursor: "pointer", fontWeight: 600, background: audio === track.url ? cat.color : "rgba(255,255,255,0.1)", color: audio === track.url ? "#000" : "rgba(255,255,255,0.5)", flexShrink: 0 }}>
                       {audio === track.url ? "✓ On" : "Use"}
                     </button>
                   </div>
                 ))}
+                {/* No tracks found */}
+                {!loadingCat && catTracks[cat.id]?.length === 0 && (
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", padding: "8px 0", textAlign: "center" }}>
+                    No tracks found — try uploading your own audio
+                  </div>
+                )}
               </div>
             )}
           </div>

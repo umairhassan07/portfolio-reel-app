@@ -1,138 +1,142 @@
 /**
- * Music library — organized by Instagram / TikTok vibe.
- * Primary: Jamendo API (royalty-free, real artists)
- * Fallback: curated tracks from Pixabay Music CDN & Mixkit
+ * Music categories — organized by Instagram / TikTok vibe.
+ * Tracks are fetched live from Jamendo API when a category is opened.
  */
 
-// ── Curated fallback tracks ──────────────────────────────────────
-// All URLs are royalty-free CDN tracks verified to play in browser.
+const JAMENDO_ID = import.meta.env.VITE_JAMENDO_CLIENT_ID || "b6747d04";
+
 export const TRENDING_CATEGORIES = [
   {
     id: "phonk",
     label: "🔥 Phonk / Trap",
     vibe: "Dark, aggressive, viral TikTok drill style",
     color: "#ff4444",
-    jamendoTags: "hiphop darkambient electronic",
-    tracks: [
-      { url: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_946b07b444.mp3", title: "Dark Phonk", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/03/10/audio_2d0b82349c.mp3", title: "Trap Rage", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2021/11/25/audio_cb8e9e6b86.mp3", title: "Drill Night", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92c21.mp3", title: "Hood Energy", artist: "Pixabay" },
-    ],
+    gradient: "linear-gradient(135deg, #1a0808, #3a0a0a)",
+    jamendoTags: "hiphop electronic dark",
+    spotifyHints: ["Astronomia Remix", "Hood Melody", "Dark Phonk"],
+    tracks: [],
   },
   {
     id: "lofi",
     label: "✨ Lo-Fi Chill",
     vibe: "Aesthetic, study vibes, Instagram chill",
     color: "#a78bfa",
+    gradient: "linear-gradient(135deg, #0f0a1a, #1a0f2e)",
     jamendoTags: "lounge ambient chill",
-    tracks: [
-      { url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3", title: "Lo-Fi Dreams", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2021/08/09/audio_88447e769b.mp3", title: "Tokyo Nights", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_0ab3e9d695.mp3", title: "Chill Afternoon", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1bab.mp3", title: "Aesthetic Mood", artist: "Pixabay" },
-    ],
+    spotifyHints: ["Lo-Fi Hip Hop", "Tokyo Nights", "Chill Study Beats"],
+    tracks: [],
   },
   {
     id: "tech",
     label: "💻 Tech / Electronic",
     vibe: "Clean, modern, developer & product vibes",
     color: "#5B8DEF",
+    gradient: "linear-gradient(135deg, #080e1a, #0f1628)",
     jamendoTags: "electronic techno house",
-    tracks: [
-      { url: "https://cdn.pixabay.com/download/audio/2022/08/23/audio_d16737dc28.mp3", title: "Digital Rush", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2021/10/19/audio_a3b9a11cc7.mp3", title: "Tech Pulse", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/11/22/audio_febc508520.mp3", title: "Code Mode", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3", title: "Neon Grid", artist: "Pixabay" },
-    ],
+    spotifyHints: ["Techno Flow", "Digital Wave", "Code Mode"],
+    tracks: [],
   },
   {
     id: "motivational",
     label: "💪 Motivational / Epic",
     vibe: "Hype, energy, gym & hustle culture",
     color: "#FF3D00",
+    gradient: "linear-gradient(135deg, #1a0800, #2e1000)",
     jamendoTags: "rock epic motivational",
-    tracks: [
-      { url: "https://cdn.pixabay.com/download/audio/2022/04/27/audio_67f2e66b0d.mp3", title: "Rise Up", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/10/28/audio_3c0ee64d04.mp3", title: "Champion", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2021/11/04/audio_cb8f89f94d.mp3", title: "No Limits", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/09/07/audio_124bfae6b3.mp3", title: "Beast Mode", artist: "Pixabay" },
-    ],
+    spotifyHints: ["Eye of the Tiger", "Power", "Champion"],
+    tracks: [],
   },
   {
     id: "cinematic",
     label: "🎬 Cinematic / Epic",
     vibe: "Dramatic, storytelling, travel & fashion reels",
     color: "#00C9FF",
+    gradient: "linear-gradient(135deg, #001a20, #002030)",
     jamendoTags: "cinematic orchestral epic",
-    tracks: [
-      { url: "https://cdn.pixabay.com/download/audio/2022/01/21/audio_d0fd6a5157.mp3", title: "Cinematic Dawn", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2021/10/05/audio_50e6e8e2af.mp3", title: "Epic Journey", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/08/31/audio_52c64ea8d3.mp3", title: "Dramatic Rise", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/03/28/audio_05cba2a43e.mp3", title: "Movie Trailer", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/04/14/audio_5f1da7bde3.mp3", title: "Grand Odyssey", artist: "Pixabay" },
-    ],
+    spotifyHints: ["Hans Zimmer Inspired", "Epic Score", "Cinematic Rise"],
+    tracks: [],
   },
   {
     id: "aesthetic",
     label: "🌸 Aesthetic / Fashion",
     vibe: "Soft, lifestyle, beauty & fashion Instagram reels",
     color: "#E8C4A0",
-    jamendoTags: "pop rnb soul",
-    tracks: [
-      { url: "https://cdn.pixabay.com/download/audio/2022/06/10/audio_33c566d13e.mp3", title: "Golden Hour", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2021/11/25/audio_2e72f31b87.mp3", title: "Soft Girl Era", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/10/11/audio_e4be7e1c0a.mp3", title: "Summer Vibes", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/02/11/audio_a347dc0aac.mp3", title: "Pink Aesthetic", artist: "Pixabay" },
-    ],
+    gradient: "linear-gradient(135deg, #1a0e0a, #2a1810)",
+    jamendoTags: "pop soul rnb",
+    spotifyHints: ["Golden Hour", "Soft Girl Era", "Summer Aesthetic"],
+    tracks: [],
   },
   {
     id: "luxury",
     label: "👑 Luxury / Ambient",
     vibe: "Sophisticated, minimal, high-end brand feel",
     color: "#D4AF37",
-    jamendoTags: "ambient classical jazz",
-    tracks: [
-      { url: "https://cdn.pixabay.com/download/audio/2022/09/18/audio_6e57e0d9ef.mp3", title: "Prestige", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3", title: "Elegance", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/07/26/audio_fc8de6df68.mp3", title: "Gold Standard", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/05/16/audio_5be36da0de.mp3", title: "Velvet Room", artist: "Pixabay" },
-    ],
+    gradient: "linear-gradient(135deg, #100e00, #1a1500)",
+    jamendoTags: "ambient jazz classical",
+    spotifyHints: ["Prestige", "Velvet Room", "Gold Standard"],
+    tracks: [],
   },
   {
     id: "pop",
     label: "🎵 Pop / Upbeat",
     vibe: "Fun, catchy, viral potential — Instagram Reels energy",
     color: "#FF6B9D",
+    gradient: "linear-gradient(135deg, #1a0810, #2a0818)",
     jamendoTags: "pop electropop dance",
-    tracks: [
-      { url: "https://cdn.pixabay.com/download/audio/2022/10/09/audio_9be53db0c7.mp3", title: "Happy Energy", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/06/06/audio_c3c6f51b2b.mp3", title: "Viral Pop", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2021/12/09/audio_f31ec65b63.mp3", title: "Upbeat Summer", artist: "Pixabay" },
-      { url: "https://cdn.pixabay.com/download/audio/2022/08/04/audio_2dde668d05.mp3", title: "Good Vibes Only", artist: "Pixabay" },
-    ],
+    spotifyHints: ["Viral Pop Hit", "Dance Floor", "Good Vibes Only"],
+    tracks: [],
   },
 ];
 
+// ── Fetch live tracks from Jamendo for a category ───────────────
+const _cache = {};
+
+export async function fetchCategoryTracks(categoryId, limit = 6) {
+  if (_cache[categoryId]) return _cache[categoryId];
+
+  const cat = TRENDING_CATEGORIES.find(c => c.id === categoryId);
+  if (!cat) return [];
+
+  try {
+    const url = `https://api.jamendo.com/v3.0/tracks/?client_id=${JAMENDO_ID}&format=json&limit=${limit}&tags=${encodeURIComponent(cat.jamendoTags)}&order=popularity_total&audioformat=mp32&imagesize=100`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) throw new Error("Jamendo error");
+    const data = await res.json();
+    const tracks = (data.results || [])
+      .filter(t => t.audio)
+      .map(t => ({ url: t.audio, title: t.name, artist: t.artist_name, image: t.image }));
+    _cache[categoryId] = tracks;
+    return tracks;
+  } catch {
+    return [];
+  }
+}
+
+// ── Auto-detect category from video context ──────────────────────
 export function detectCategory(projectName = "", tagline = "", description = "") {
   const text = `${projectName} ${tagline} ${description}`.toLowerCase();
-  if (text.match(/code|dev|tech|web|app|software|react|javascript|programming|startup|saas/)) return "tech";
-  if (text.match(/motivat|hustle|grind|success|achieve|power|energy|gym|fitness|sport|warrior|champion/)) return "motivational";
-  if (text.match(/travel|adventure|landscape|journey|explore|mountain|ocean|nature|cinematic|dramatic|epic|story/)) return "cinematic";
-  if (text.match(/fashion|style|elegance|luxury|prestige|gold|premium|exclusive|haute|editorial/)) return "aesthetic";
-  if (text.match(/luxury|premium|gold|prestige|exclusive|elite|penthouse|watch|yacht/)) return "luxury";
-  if (text.match(/chill|relax|calm|study|lofi|lo-fi|ambient|peace|aesthetic|minimal|soft/)) return "lofi";
-  if (text.match(/drill|phonk|dark|hard|trap|bass|hood|street/)) return "phonk";
-  if (text.match(/pop|fun|happy|dance|party|viral|reel|energy|upbeat/)) return "pop";
+  if (text.match(/code|dev|tech|web|app|software|react|javascript|startup|saas/)) return "tech";
+  if (text.match(/motivat|hustle|grind|gym|fitness|sport|warrior|champion|energy/)) return "motivational";
+  if (text.match(/travel|adventure|mountain|ocean|nature|cinematic|dramatic|epic|journey/)) return "cinematic";
+  if (text.match(/fashion|style|editorial|haute|beauty|lifestyle/)) return "aesthetic";
+  if (text.match(/luxury|premium|gold|prestige|exclusive|elite|penthouse|yacht/)) return "luxury";
+  if (text.match(/chill|relax|calm|lofi|lo-fi|ambient|minimal|soft/)) return "lofi";
+  if (text.match(/drill|phonk|dark|trap|bass|hood|street/)) return "phonk";
+  if (text.match(/pop|fun|happy|dance|viral|upbeat/)) return "pop";
   return "cinematic";
 }
 
 export function getCategoryById(id) {
-  return TRENDING_CATEGORIES.find((c) => c.id === id) || TRENDING_CATEGORIES[4];
+  return TRENDING_CATEGORIES.find(c => c.id === id) || TRENDING_CATEGORIES[4];
 }
 
-export function getTrackForCategory(categoryId) {
-  const cat = getCategoryById(categoryId);
-  const track = cat.tracks[Math.floor(Math.random() * cat.tracks.length)];
-  return { ...track, category: cat.label };
+export async function getTrackForCategory(categoryId) {
+  const tracks = await fetchCategoryTracks(categoryId, 8);
+  if (tracks.length) {
+    const pick = tracks[Math.floor(Math.random() * Math.min(tracks.length, 4))];
+    const cat = getCategoryById(categoryId);
+    return { ...pick, category: cat.label };
+  }
+  // Hard fallback — silence (graceful)
+  return { url: null, title: "No track found", artist: "", category: categoryId };
 }
