@@ -155,50 +155,34 @@ app.post("/api/generate-image", async (req, res) => {
     // Use workspace-specific base URL from env var
     const apiBase = process.env.QWEN_API_BASE || "https://dashscope.aliyuncs.com";
 
-    const workspaceBase = process.env.QWEN_API_BASE || "";
+    // Together AI — FLUX.1-schnell-Free is permanently free, no credits needed
+    const togetherKey = process.env.TOGETHER_API_KEY;
+    if (!togetherKey) return res.status(500).json({ error: "TOGETHER_API_KEY not set. Get a free key at api.together.xyz" });
 
-    // Endpoint candidates — international DashScope, workspace-specific, then China DashScope
-    const baseUrls = [
-      "https://dashscope-intl.aliyuncs.com",
-      ...(workspaceBase ? [workspaceBase] : []),
-      "https://dashscope.aliyuncs.com",
-    ];
-    const models = ["wanx2.1-t2i-turbo", "wanx2.1-t2i-plus", "wanx2.0-t2i-turbo", "wanx-v1"];
+    const r = await fetch("https://api.together.xyz/v1/images/generations", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${togetherKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "black-forest-labs/FLUX.1-schnell-Free",
+        prompt,
+        width: 576,
+        height: 1024,
+        steps: 4,
+        n: 1,
+        response_format: "b64_json",
+        seed,
+      }),
+    });
 
-    let imageUrl = null;
-    let lastErr = "";
+    const d = await r.json();
+    console.log("[img] Together AI status:", r.status, JSON.stringify(d).slice(0, 200));
 
-    outer: for (const base of baseUrls) {
-      for (const model of models) {
-        try {
-          const r = await fetch(`${base}/api/v1/services/aigc/text2image/image-synthesis`, {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-              model,
-              input: { prompt },
-              parameters: { size: "576*1024", n: 1, seed },
-            }),
-          });
-          const d = await r.json();
-          console.log(`[img] ${base.split(".")[0].split("//")[1]} / ${model}:`, JSON.stringify(d).slice(0, 150));
-          const url = d?.output?.results?.[0]?.url;
-          if (url) { imageUrl = url; break outer; }
-          lastErr = `${model}@${base}: ${d?.message || d?.code || ""}`;
-          if (!d?.message?.includes("not exist") && !d?.message?.includes("Model")) break outer; // hard error, stop
-        } catch (e) { lastErr = `${model}: ${e.message}`; break outer; }
-      }
-    }
+    if (!r.ok) return res.status(r.status).json({ error: d?.error?.message || JSON.stringify(d) });
 
-    if (!imageUrl) return res.status(500).json({ error: lastErr || "No image URL returned" });
+    const b64 = d?.data?.[0]?.b64_json;
+    if (!b64) return res.status(500).json({ error: "No image data returned", raw: d });
 
-    // Fetch the image and convert to base64 so the browser can display it
-    const imgRes = await fetch(imageUrl);
-    const buffer = await imgRes.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString("base64");
-    const contentType = imgRes.headers.get("content-type") || "image/jpeg";
-
-    return res.json({ image: `data:${contentType};base64,${base64}`, seed });
+    return res.json({ image: `data:image/jpeg;base64,${b64}`, seed });
   } catch (err) {
     console.error("[generate-image] Error:", err.message);
     return res.status(500).json({ error: err.message });
