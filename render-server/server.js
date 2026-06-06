@@ -152,8 +152,8 @@ app.post("/api/generate-image", async (req, res) => {
   if (!apiKey) return res.status(500).json({ error: "QWEN_API_KEY not set on Railway" });
 
   try {
-    // Qwen Wanx — OpenAI-compatible endpoint
-    const response = await fetch("https://dashscope.aliyuncs.com/compatible-mode/v1/images/generations", {
+    // Qwen Wanx — native DashScope API (compatible-mode doesn't support Wanx)
+    const response = await fetch("https://dashscope.aliyuncs.com/api/v1/services/aigc/text2image/image-synthesis", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
@@ -161,21 +161,25 @@ app.post("/api/generate-image", async (req, res) => {
       },
       body: JSON.stringify({
         model: "wanx2.1-t2i-turbo",
-        prompt,
-        n: 1,
-        size: "576*1024",   // 9:16 portrait — perfect for reels
-        seed,
+        input: { prompt },
+        parameters: {
+          size: "576*1024",  // 9:16 portrait
+          n: 1,
+          seed,
+        },
       }),
     });
 
     if (!response.ok) {
       const text = await response.text();
       console.error("[generate-image] Qwen error:", response.status, text);
-      return res.status(response.status).json({ error: `Qwen API error: ${text.slice(0, 300)}` });
+      return res.status(response.status).json({ error: `Qwen API error ${response.status}: ${text.slice(0, 300)}` });
     }
 
     const data = await response.json();
-    const imageUrl = data?.data?.[0]?.url;
+    console.log("[generate-image] Qwen response:", JSON.stringify(data).slice(0, 200));
+
+    const imageUrl = data?.output?.results?.[0]?.url;
     if (!imageUrl) return res.status(500).json({ error: "No image URL in response", raw: data });
 
     // Fetch the image and convert to base64 so the browser can display it
