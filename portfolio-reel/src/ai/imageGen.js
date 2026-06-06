@@ -34,7 +34,9 @@ export async function generateImage({ prompt, style = "cinematic", seed }) {
   const fullPrompt = `${prompt}, ${styleDesc}`;
   const s = seed ?? Math.floor(Math.random() * 99999);
 
-  const res = await fetch("/api/generate-image", {
+  // Use Railway render server (no timeout limit) instead of Vercel (10s Hobby limit)
+  const base = import.meta.env.VITE_RENDER_SERVER_URL || "";
+  const res = await fetch(`${base}/api/generate-image`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prompt: fullPrompt, seed: s }),
