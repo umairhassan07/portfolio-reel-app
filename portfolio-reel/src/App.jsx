@@ -217,43 +217,190 @@ const SvgIcon = ({ d, d2, viewBox = "0 0 24 24", size = 20, children }) => (
 );
 
 const SIDEBAR_ITEMS = [
-  {
-    id: "media", label: "Media",
-    icon: <SvgIcon><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></SvgIcon>,
-  },
-  {
-    id: "audio", label: "Audio",
-    icon: <SvgIcon d="M9 18V5l12-2v13"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></SvgIcon>,
-  },
-  {
-    id: "text", label: "Text",
-    icon: <SvgIcon><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></SvgIcon>,
-  },
-  {
-    id: "transitions", label: "Cuts",
-    icon: <SvgIcon><rect x="2" y="4" width="8" height="16" rx="1.5"/><path d="M14 8l6 4-6 4V8z"/></SvgIcon>,
-  },
-  {
-    id: "effects", label: "Effects",
-    icon: <SvgIcon d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />,
-  },
-  {
-    id: "voice", label: "Voice",
-    icon: <SvgIcon><path d="M12 1a3 3 0 0 1 3 3v8a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></SvgIcon>,
-  },
-  {
-    id: "stickers", label: "Stickers",
-    icon: <SvgIcon><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 6-6"/><path d="M18 14l2 2-4 4-2-2"/></SvgIcon>,
-  },
-  {
-    id: "templates", label: "Templates",
-    icon: <SvgIcon><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></SvgIcon>,
-  },
-  {
-    id: "filters", label: "Filters",
-    icon: <SvgIcon><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/><circle cx="7" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="17" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="18" r="2" fill="currentColor" stroke="none"/></SvgIcon>,
-  },
+  { id: "generate", label: "Generate", icon: <SvgIcon><path d="M12 2l1.5 4.5H18l-3.75 2.7 1.5 4.5L12 11.1l-3.75 2.6 1.5-4.5L6 6.5h4.5z"/><path d="M5 19h14M8 22h8" strokeWidth="1.5"/></SvgIcon> },
+  { id: "media",    label: "Media",    icon: <SvgIcon><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></SvgIcon> },
+  { id: "audio",    label: "Audio",    icon: <SvgIcon d="M9 18V5l12-2v13"><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></SvgIcon> },
+  { id: "text",     label: "Text",     icon: <SvgIcon><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></SvgIcon> },
+  { id: "transitions", label: "Cuts",  icon: <SvgIcon><rect x="2" y="4" width="8" height="16" rx="1.5"/><path d="M14 8l6 4-6 4V8z"/></SvgIcon> },
+  { id: "effects",  label: "Effects",  icon: <SvgIcon d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /> },
+  { id: "voice",    label: "Voice",    icon: <SvgIcon><path d="M12 1a3 3 0 0 1 3 3v8a3 3 0 0 1-6 0V4a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></SvgIcon> },
+  { id: "stickers", label: "Stickers", icon: <SvgIcon><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 6-6"/><path d="M18 14l2 2-4 4-2-2"/></SvgIcon> },
+  { id: "templates",label: "Templates",icon: <SvgIcon><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></SvgIcon> },
+  { id: "filters",  label: "Filters",  icon: <SvgIcon><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/><circle cx="7" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="17" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="12" cy="18" r="2" fill="currentColor" stroke="none"/></SvgIcon> },
 ];
+
+// ── AI Image Generate Panel ────────────────────────────────────
+function GeneratePanel({ onAddSlide }) {
+  const [prompt, setPrompt] = useState("");
+  const [style, setStyle] = useState("cinematic");
+  const [refImage, setRefImage] = useState(null);
+  const [refDesc, setRefDesc] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState([]);
+  const [adding, setAdding] = useState(null);
+  const refInputRef = useRef(null);
+
+  const STYLES = [
+    { id: "cinematic", label: "🎬 Cinematic", color: "#00C9FF" },
+    { id: "fashion",   label: "👗 Fashion",   color: "#E8C4A0" },
+    { id: "tech",      label: "💻 Tech",       color: "#5B8DEF" },
+    { id: "fitness",   label: "💪 Fitness",    color: "#FF3D00" },
+    { id: "travel",    label: "✈️ Travel",     color: "#00FF94" },
+    { id: "luxury",    label: "👑 Luxury",     color: "#D4AF37" },
+    { id: "food",      label: "🍽️ Food",       color: "#FF8C42" },
+    { id: "abstract",  label: "🎨 Abstract",   color: "#C77DFF" },
+    { id: "portrait",  label: "👤 Portrait",   color: "#FF6B9D" },
+    { id: "minimal",   label: "◻️ Minimal",    color: "#E8E8E8" },
+  ];
+
+  const generate = async () => {
+    if (!prompt.trim()) return;
+    setLoading(true);
+    try {
+      const { generateImage, buildReferencePrompt } = await import("./ai/imageGen.js");
+      const fullPrompt = buildReferencePrompt(prompt, refDesc);
+      // Generate 2 variations with different seeds
+      const variations = await Promise.all([
+        generateImage({ prompt: fullPrompt, style, width: 768, height: 1344 }),
+        generateImage({ prompt: fullPrompt, style, width: 768, height: 1344 }),
+      ]);
+      setResults(prev => [...variations, ...prev].slice(0, 12));
+    } catch (e) {
+      console.error(e);
+    }
+    setLoading(false);
+  };
+
+  const handleRef = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setRefImage(url);
+  };
+
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", background: "#161622" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "10px 10px 6px", scrollbarWidth: "thin", scrollbarColor: `${ACC}44 transparent` }}>
+
+        {/* Prompt */}
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 5 }}>Describe your image</div>
+          <textarea
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            placeholder="e.g. woman in luxury penthouse, golden hour, cinematic..."
+            rows={3}
+            style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, color: "#fff", fontSize: 11, padding: "8px 10px", resize: "none", fontFamily: "Inter, sans-serif", outline: "none", boxSizing: "border-box", lineHeight: 1.5 }}
+            onKeyDown={e => e.key === "Enter" && e.metaKey && generate()}
+          />
+        </div>
+
+        {/* Style grid */}
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 5 }}>Style</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
+            {STYLES.map(s => (
+              <button key={s.id} onClick={() => setStyle(s.id)} style={{
+                background: style === s.id ? `${s.color}22` : "rgba(255,255,255,0.04)",
+                border: `1px solid ${style === s.id ? s.color : "rgba(255,255,255,0.08)"}`,
+                borderRadius: 7, color: style === s.id ? s.color : "rgba(255,255,255,0.5)",
+                fontSize: 10, fontWeight: 600, padding: "6px 6px", cursor: "pointer", textAlign: "left",
+                transition: "all 0.15s",
+              }}>
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Reference image */}
+        <div style={{ marginBottom: 10 }}>
+          <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 5 }}>Reference image (optional)</div>
+          <input ref={refInputRef} type="file" accept="image/*" onChange={handleRef} style={{ display: "none" }} />
+          {refImage ? (
+            <div style={{ position: "relative", borderRadius: 8, overflow: "hidden", marginBottom: 6 }}>
+              <img src={refImage} style={{ width: "100%", height: 90, objectFit: "cover", display: "block" }} />
+              <button onClick={() => { setRefImage(null); setRefDesc(""); }} style={{ position: "absolute", top: 4, right: 4, width: 20, height: 20, borderRadius: "50%", background: "rgba(0,0,0,0.7)", border: "none", color: "#fff", fontSize: 10, cursor: "pointer" }}>✕</button>
+            </div>
+          ) : (
+            <button onClick={() => refInputRef.current?.click()} style={{ width: "100%", background: "rgba(255,255,255,0.03)", border: "1px dashed rgba(255,255,255,0.12)", borderRadius: 8, color: "rgba(255,255,255,0.3)", fontSize: 10, padding: "10px", cursor: "pointer" }}>
+              + Upload reference image
+            </button>
+          )}
+          {refImage && (
+            <input
+              value={refDesc}
+              onChange={e => setRefDesc(e.target.value)}
+              placeholder="Describe reference style (e.g. dark moody tones, neon lights)..."
+              style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 7, color: "#fff", fontSize: 10, padding: "7px 8px", fontFamily: "Inter", boxSizing: "border-box", marginTop: 4, outline: "none" }}
+            />
+          )}
+        </div>
+
+        {/* Generate button */}
+        <button
+          onClick={generate}
+          disabled={loading || !prompt.trim()}
+          style={{
+            width: "100%", padding: "10px", borderRadius: 10, border: "none", cursor: loading || !prompt.trim() ? "default" : "pointer",
+            background: loading || !prompt.trim() ? "rgba(108,99,255,0.3)" : `linear-gradient(135deg, ${ACC}, #9c56ff)`,
+            color: "#fff", fontSize: 12, fontWeight: 700, marginBottom: 12,
+            boxShadow: loading ? "none" : `0 4px 20px ${ACC}44`,
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            transition: "all 0.2s",
+          }}
+        >
+          {loading ? (
+            <><span style={{ display: "inline-block", animation: "spin 1s linear infinite" }}>⟳</span> Generating…</>
+          ) : (
+            <><span>✦</span> Generate Images</>
+          )}
+        </button>
+
+        {/* Results grid */}
+        {results.length > 0 && (
+          <div>
+            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Generated ({results.length})</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+              {results.map((r, i) => (
+                <div key={i} style={{ position: "relative", borderRadius: 8, overflow: "hidden", background: "#0a0a14", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <img
+                    src={r.url}
+                    alt={`Generated ${i + 1}`}
+                    style={{ width: "100%", aspectRatio: "9/16", objectFit: "cover", display: "block" }}
+                    loading="lazy"
+                    onError={e => { e.target.style.display = "none"; }}
+                  />
+                  {/* Overlay actions */}
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%)", opacity: 0, transition: "opacity 0.2s" }}
+                    onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                    onMouseLeave={e => e.currentTarget.style.opacity = 0}
+                  >
+                    <button
+                      onClick={async () => { setAdding(i); await onAddSlide(r.url); setAdding(null); }}
+                      style={{ position: "absolute", bottom: 6, left: "50%", transform: "translateX(-50%)", background: ACC, border: "none", borderRadius: 6, color: "#fff", fontSize: 9, fontWeight: 700, padding: "5px 10px", cursor: "pointer", whiteSpace: "nowrap" }}
+                    >
+                      {adding === i ? "Adding…" : "+ Add to Reel"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty state */}
+        {results.length === 0 && !loading && (
+          <div style={{ textAlign: "center", padding: "20px 10px", color: "rgba(255,255,255,0.2)", fontSize: 11, lineHeight: 1.7 }}>
+            <div style={{ fontSize: 28, marginBottom: 8 }}>✦</div>
+            <div>Describe your image and pick a style.</div>
+            <div style={{ fontSize: 9, marginTop: 4 }}>Powered by Pollinations AI · Free · No API key</div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function CapCutSidebar({ slides, audio, selectedSlide, setSelectedSlide, addSlide, setAudio, addTransition, setText, setTextStyle, setTheme, resolveImage, fileInputRef, addLocalFiles, state, onAddPexelsSlide, onAddSticker, onAddTextLayer, onApplyTemplate, onSetAudioVolume, onSetKenBurns, onRemoveSticker, onUpdateSticker, onRemoveTextLayer, onUpdateTextLayer, setCaption, reorderSlides, addVoiceover, removeVoiceover, updateVoiceover }) {
   const [activePanel, setActivePanel] = useState("media");
@@ -323,6 +470,10 @@ function CapCutSidebar({ slides, audio, selectedSlide, setSelectedSlide, addSlid
 
           {/* Panel content */}
           <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+
+            {activePanel === "generate" && (
+              <GeneratePanel onAddSlide={(url) => onAddPexelsSlide(url)} />
+            )}
 
             {activePanel === "media" && (
               <MediaPanel slides={slides} selectedSlide={selectedSlide} setSelectedSlide={setSelectedSlide} resolveImage={resolveImage} fileInputRef={fileInputRef} addLocalFiles={addLocalFiles} onAddPexelsSlide={onAddPexelsSlide} onReorderSlides={(from, to) => reorderSlides?.(from, to)} />
@@ -1174,150 +1325,168 @@ function AudioTab({ audio, setAudio, audioInputRef, addAudioFiles, allAudioFiles
 const BASE_PX = 3;
 const LABEL_W = 160;
 
-function Timeline({ slides, transitions, onSelectSlide, selectedSlide, totalDuration, onResizeSlide, audio, zoomLevel = 1, setZoomLevel, currentFrame = 0 }) {
+function Timeline({ slides, transitions, onSelectSlide, selectedSlide, totalDuration, onResizeSlide, audio, zoomLevel = 1, setZoomLevel, currentFrame = 0, onSeek }) {
   const PX_PER_FRAME = BASE_PX * zoomLevel;
-  const rulerRef = useRef(null);
-  const trackAreaRef = useRef(null);
+  const scrollRef = useRef(null);
   const resizeRef = useRef(null);
 
   // Ctrl/Cmd + scroll to zoom
   useEffect(() => {
-    const el = trackAreaRef.current;
+    const el = scrollRef.current;
     if (!el || !setZoomLevel) return;
     const onWheel = (e) => {
       if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.1 : 0.1;
-      setZoomLevel(z => Math.min(4, Math.max(0.25, +(z + delta).toFixed(2))));
+      setZoomLevel(z => Math.min(6, Math.max(0.3, +(z + (e.deltaY > 0 ? -0.15 : 0.15)).toFixed(2))));
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
   }, [setZoomLevel]);
 
-  const INTRO = 40;
-  const OUTRO = 30;
-
-  const layers = [];
-  layers.push({ label: "<Intro>", from: 0, duration: INTRO, color: "#3a4070", type: "system" });
-
-  let cursor = INTRO;
-  slides.forEach((slide, i) => {
-    const trans = transitions.find((t) => t.afterSlideIndex === i - 1);
-    if (trans && i > 0) {
-      layers.push({ label: `<Transition> ${trans.type}`, from: cursor, duration: trans.duration, color: "#5a3080", type: "transition" });
-      cursor += trans.duration;
-    }
-    layers.push({ label: `<Slide ${i + 1}> ${slide.image}`, from: cursor, duration: slide.duration, color: "#1a5fa0", type: "slide", index: i, active: selectedSlide === i });
-    cursor += slide.duration;
-  });
-  layers.push({ label: "<Outro>", from: cursor, duration: OUTRO, color: "#3a4070", type: "system" });
-
-  // Audio track — spans full video
-  if (audio) {
-    layers.push({ label: "🎵 Audio Track", from: 0, duration: totalDuration, color: "#1a5a3a", type: "audio" });
-  }
-
-  // Adaptive tick spacing — at low zoom show every 2s, at high zoom every 0.5s
-  const tickEvery = zoomLevel >= 2 ? 15 : zoomLevel >= 1 ? 30 : 60;
+  const INTRO = 40, OUTRO = 30;
+  const tickEvery = zoomLevel >= 3 ? 10 : zoomLevel >= 1.5 ? 15 : zoomLevel >= 0.8 ? 30 : 60;
   const ticks = [];
   for (let f = 0; f <= totalDuration; f += tickEvery) {
-    const s = f / 30;
-    ticks.push({ f, label: `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}` });
+    ticks.push({ f, label: `${String(Math.floor(f / 30 / 60)).padStart(2,"0")}:${String(Math.floor(f / 30) % 60).padStart(2,"0")}` });
   }
 
-  const handleRulerClick = (e) => {
-    const rect = rulerRef.current.getBoundingClientRect();
-    const frame = Math.round(Math.max(0, Math.min(totalDuration, (e.clientX - rect.left) / PX_PER_FRAME)));
-    // propagate to player via seekTo
-  };
+  // Build slide timeline positions
+  let cursor = INTRO;
+  const slideItems = slides.map((slide, i) => {
+    const trans = transitions.find(t => t.afterSlideIndex === i - 1);
+    const transFrames = (trans && i > 0) ? trans.duration : 0;
+    if (transFrames) cursor += transFrames;
+    const item = { slide, index: i, from: cursor, duration: slide.duration, trans: trans && i > 0 ? trans : null, transFrom: cursor - transFrames, transFrames };
+    cursor += slide.duration;
+    return item;
+  });
 
   const startResize = (e, index, currentDuration) => {
-    e.stopPropagation();
-    e.preventDefault();
+    e.stopPropagation(); e.preventDefault();
     resizeRef.current = { index, startX: e.clientX, startDuration: currentDuration };
     const onMove = (ev) => {
       if (!resizeRef.current) return;
-      const dx = ev.clientX - resizeRef.current.startX;
-      const newFrames = resizeRef.current.startDuration + Math.round(dx / PX_PER_FRAME);
+      const newFrames = Math.max(15, resizeRef.current.startDuration + Math.round((ev.clientX - resizeRef.current.startX) / PX_PER_FRAME));
       onResizeSlide(resizeRef.current.index, newFrames);
     };
-    const onUp = () => {
-      resizeRef.current = null;
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
+    const onUp = () => { resizeRef.current = null; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
   };
 
+  const totalW = Math.max(totalDuration * PX_PER_FRAME + 120, 500);
+  const TRACK_H = 56;
+  const AUDIO_H = 22;
+  const RULER_H = 24;
+
   return (
-    <div style={{ display: "flex", flex: 1, minHeight: 0, height: "100%", overflow: "hidden" }}>
-      {/* Label column — synced scroll with track area */}
-      <div style={{ width: LABEL_W, flexShrink: 0, borderRight: "1px solid rgba(255,255,255,0.1)", background: "#0f0f1c", overflowY: "auto", scrollbarWidth: "none" }}>
-        <div style={{ height: 26, borderBottom: "1px solid rgba(255,255,255,0.08)", background: "#0f0f1c" }} />
-        {layers.map((l, i) => (
-          <div key={i} onClick={() => l.type === "slide" && onSelectSlide(l.index === selectedSlide ? null : l.index)}
-            style={{ height: 32, padding: "0 12px", display: "flex", alignItems: "center", fontSize: 10, color: l.active ? "#fff" : "rgba(255,255,255,0.5)", borderBottom: "1px solid rgba(255,255,255,0.05)", cursor: l.type === "slide" ? "pointer" : "default", background: l.active ? `${ACC}25` : "transparent", gap: 6 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 2, background: l.color, flexShrink: 0 }} />
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{l.label}</span>
-          </div>
-        ))}
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "#09090f", borderTop: "1px solid rgba(255,255,255,0.07)", userSelect: "none" }}>
+
+      {/* Top bar: zoom controls */}
+      <div style={{ height: 28, flexShrink: 0, display: "flex", alignItems: "center", padding: "0 12px", gap: 8, borderBottom: "1px solid rgba(255,255,255,0.06)", background: "#0c0c16" }}>
+        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", letterSpacing: 0.5 }}>TIMELINE</span>
+        <div style={{ flex: 1 }} />
+        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.25)" }}>{slides.length} clips · {(totalDuration/30).toFixed(1)}s</span>
+        <button onClick={() => setZoomLevel(z => Math.max(0.3, +(z - 0.25).toFixed(2)))} style={{ width: 20, height: 20, borderRadius: 5, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
+        <span style={{ fontSize: 9, color: "rgba(255,255,255,0.35)", minWidth: 30, textAlign: "center" }}>{Math.round(zoomLevel * 100)}%</span>
+        <button onClick={() => setZoomLevel(z => Math.min(6, +(z + 0.25).toFixed(2)))} style={{ width: 20, height: 20, borderRadius: 5, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+        <button onClick={() => setZoomLevel(1)} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.35)", cursor: "pointer" }}>fit</button>
       </div>
 
-      {/* Tracks — horizontally scrollable */}
-      <div ref={trackAreaRef} style={{ flex: 1, overflowX: "auto", overflowY: "hidden", position: "relative", scrollbarWidth: "thin", scrollbarColor: `${ACC}44 transparent` }}>
-        <div style={{ width: Math.max(totalDuration * PX_PER_FRAME + 80, 600), position: "relative" }}>
+      {/* Scrollable track area */}
+      <div ref={scrollRef} style={{ flex: 1, overflowX: "auto", overflowY: "hidden", scrollbarWidth: "thin", scrollbarColor: `${ACC}33 transparent`, position: "relative" }}>
+        <div style={{ width: totalW, position: "relative", minHeight: RULER_H + TRACK_H + AUDIO_H + 4 }}>
 
           {/* Ruler */}
-          <div ref={rulerRef} onClick={handleRulerClick}
-            style={{ height: 26, position: "relative", borderBottom: "1px solid rgba(255,255,255,0.1)", cursor: "col-resize", background: "#0c0c1a", userSelect: "none" }}>
-            {ticks.map((t) => (
-              <div key={t.f} style={{ position: "absolute", left: t.f * PX_PER_FRAME, top: 0, height: "100%" }}>
-                <div style={{ width: 1, height: 6, background: "rgba(255,255,255,0.2)", marginTop: 5 }} />
-                <span style={{ fontSize: 8, color: "rgba(255,255,255,0.4)", paddingLeft: 3, whiteSpace: "nowrap" }}>{t.label}</span>
+          <div
+            style={{ height: RULER_H, position: "relative", background: "linear-gradient(180deg,#0f0f1e,#0c0c16)", borderBottom: "1px solid rgba(255,255,255,0.08)", cursor: "pointer" }}
+            onClick={e => { if (!onSeek) return; const rect = e.currentTarget.getBoundingClientRect(); onSeek(Math.round(Math.max(0, Math.min(totalDuration, (e.clientX - rect.left) / PX_PER_FRAME)))); }}
+          >
+            {ticks.map(t => (
+              <div key={t.f} style={{ position: "absolute", left: t.f * PX_PER_FRAME, top: 0, height: "100%", pointerEvents: "none" }}>
+                <div style={{ width: 1, height: t.f % (tickEvery * 2) === 0 ? 10 : 6, background: "rgba(255,255,255,0.15)", marginTop: t.f % (tickEvery * 2) === 0 ? 8 : 10 }} />
+                {t.f % (tickEvery * 2) === 0 && <span style={{ fontSize: 8, color: "rgba(255,255,255,0.35)", paddingLeft: 3, position: "absolute", top: 6, whiteSpace: "nowrap" }}>{t.label}</span>}
               </div>
             ))}
-            {/* Playhead in ruler */}
-            <div style={{ position: "absolute", left: currentFrame * PX_PER_FRAME, top: 0, width: 2, height: "100%", background: "#ef4444", pointerEvents: "none", zIndex: 10 }}>
-              <div style={{ width: 10, height: 10, background: "#ef4444", borderRadius: "50%", marginLeft: -4, marginTop: -1 }} />
-            </div>
+            {/* Playhead triangle */}
+            <div style={{ position: "absolute", left: currentFrame * PX_PER_FRAME, top: 0, width: 0, height: 0, borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: `8px solid ${ACC}`, transform: "translateX(-5px)", pointerEvents: "none", zIndex: 20 }} />
+            <div style={{ position: "absolute", left: currentFrame * PX_PER_FRAME, top: 8, width: 2, height: RULER_H - 8, background: ACC, transform: "translateX(-1px)", pointerEvents: "none", zIndex: 20 }} />
           </div>
 
-          {/* Track rows */}
-          {layers.map((l, i) => (
-            <div key={i} onClick={() => l.type === "slide" && onSelectSlide(l.index === selectedSlide ? null : l.index)}
-              style={{ height: 32, position: "relative", borderBottom: "1px solid rgba(255,255,255,0.05)", background: i % 2 === 0 ? "rgba(255,255,255,0.015)" : "transparent", cursor: l.type === "slide" ? "pointer" : "default" }}>
+          {/* Main slide track */}
+          <div style={{ height: TRACK_H, position: "relative", background: "rgba(255,255,255,0.015)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
 
-              <div style={{
-                position: "absolute",
-                left: l.from * PX_PER_FRAME,
-                width: Math.max(l.duration * PX_PER_FRAME - 1, 4),
-                top: 4, bottom: 4,
-                background: l.type === "slide" ? (l.active ? `${ACC}cc` : "#2060a8")
-                          : l.type === "transition" ? "#6030a0"
-                          : l.type === "audio" ? "#1a6040"
-                          : "#303060",
-                borderRadius: 5,
-                border: l.active ? `1.5px solid ${ACC}` : "1px solid rgba(255,255,255,0.12)",
-                display: "flex", alignItems: "center", paddingLeft: 7, overflow: "hidden",
-                boxShadow: l.active ? `0 0 0 2px ${ACC}44` : "none",
-              }}>
-                <span style={{ fontSize: 9, color: "rgba(255,255,255,0.85)", whiteSpace: "nowrap", fontWeight: 500, flex: 1, overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {l.type === "slide" ? `${(l.duration / 30).toFixed(1)}s` : l.type === "audio" ? "🎵" : `${l.duration}f`}
-                </span>
-                {/* Resize handle for slides only */}
-                {l.type === "slide" && l.duration * PX_PER_FRAME > 20 && (
-                  <div onMouseDown={(e) => startResize(e, l.index, l.duration)}
-                    style={{ width: 8, height: "100%", cursor: "ew-resize", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.08)", borderLeft: "1px solid rgba(255,255,255,0.15)" }}>
-                    <div style={{ width: 2, height: 10, background: "rgba(255,255,255,0.4)", borderRadius: 1 }} />
-                  </div>
-                )}
-              </div>
+            {/* Intro block */}
+            <div style={{ position: "absolute", left: 0, width: INTRO * PX_PER_FRAME, top: 6, bottom: 6, background: "rgba(255,255,255,0.04)", borderRadius: 6, border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: 8, color: "rgba(255,255,255,0.2)", fontWeight: 600, letterSpacing: 0.5 }}>INTRO</span>
             </div>
-          ))}
 
-          {/* Playhead line across all rows */}
-          <div style={{ position: "absolute", left: currentFrame * PX_PER_FRAME + 1, top: 24, width: 1, height: layers.length * 32, background: "#ef4444", opacity: 0.5, pointerEvents: "none", zIndex: 5 }} />
+            {/* Slide clips */}
+            {slideItems.map(item => {
+              const isActive = selectedSlide === item.index;
+              const clipW = Math.max(item.duration * PX_PER_FRAME - 2, 4);
+              const clipColor = isActive ? ACC : `${ACC}66`;
+              const hasThumb = item.slide.image?.startsWith("http");
+
+              return (
+                <React.Fragment key={item.index}>
+                  {/* Transition marker */}
+                  {item.trans && (
+                    <div style={{ position: "absolute", left: item.transFrom * PX_PER_FRAME, width: Math.max(item.transFrames * PX_PER_FRAME, 3), top: 6, bottom: 6, background: "rgba(168,85,247,0.35)", borderRadius: 4, border: "1px solid rgba(168,85,247,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 3 }}>
+                      {item.transFrames * PX_PER_FRAME > 20 && <span style={{ fontSize: 7, color: "rgba(168,85,247,0.9)", fontWeight: 700, letterSpacing: 0.5 }}>{item.trans.type?.replace("_"," ").toUpperCase()}</span>}
+                    </div>
+                  )}
+
+                  {/* Slide clip */}
+                  <div
+                    onClick={() => onSelectSlide(isActive ? null : item.index)}
+                    style={{ position: "absolute", left: item.from * PX_PER_FRAME, width: clipW, top: 6, bottom: 6, borderRadius: 8, overflow: "hidden", cursor: "pointer", border: `1.5px solid ${isActive ? ACC : "rgba(108,99,255,0.3)"}`, boxShadow: isActive ? `0 0 12px ${ACC}66` : "none", zIndex: 4, transition: "box-shadow 0.15s" }}
+                  >
+                    {/* Thumbnail background */}
+                    {hasThumb && <img src={item.slide.image} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.55 }} loading="lazy" />}
+                    {/* Gradient overlay */}
+                    <div style={{ position: "absolute", inset: 0, background: isActive ? `linear-gradient(135deg, ${ACC}99, ${ACC}44)` : "linear-gradient(135deg, rgba(108,99,255,0.5), rgba(108,99,255,0.2))" }} />
+                    {/* Label */}
+                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", paddingLeft: 7, paddingRight: 6, gap: 4 }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: "#fff", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textShadow: "0 1px 4px rgba(0,0,0,0.8)" }}>
+                        {clipW > 40 ? `${item.index + 1}` : ""} {clipW > 70 ? `· ${(item.duration/30).toFixed(1)}s` : ""}
+                      </span>
+                      {/* Number badge */}
+                      <div style={{ width: 16, height: 16, borderRadius: 4, background: isActive ? ACC : "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{item.index + 1}</div>
+                    </div>
+                    {/* Resize handle */}
+                    {clipW > 24 && (
+                      <div onMouseDown={e => startResize(e, item.index, item.duration)}
+                        style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 8, cursor: "ew-resize", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.3)" }}>
+                        <div style={{ width: 2, height: 12, background: "rgba(255,255,255,0.5)", borderRadius: 1 }} />
+                      </div>
+                    )}
+                  </div>
+                </React.Fragment>
+              );
+            })}
+
+            {/* Outro block */}
+            <div style={{ position: "absolute", left: (totalDuration - OUTRO) * PX_PER_FRAME, width: OUTRO * PX_PER_FRAME, top: 6, bottom: 6, background: "rgba(255,255,255,0.04)", borderRadius: 6, border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ fontSize: 8, color: "rgba(255,255,255,0.2)", fontWeight: 600, letterSpacing: 0.5 }}>OUTRO</span>
+            </div>
+
+            {/* Playhead line */}
+            <div style={{ position: "absolute", left: currentFrame * PX_PER_FRAME, top: 0, bottom: 0, width: 2, background: ACC, opacity: 0.9, transform: "translateX(-1px)", pointerEvents: "none", zIndex: 10 }} />
+          </div>
+
+          {/* Audio track */}
+          <div style={{ height: AUDIO_H, position: "relative", background: "rgba(34,197,94,0.03)" }}>
+            {audio && (
+              <div style={{ position: "absolute", left: 0, width: totalDuration * PX_PER_FRAME, top: 4, bottom: 4, background: "linear-gradient(135deg, rgba(34,197,94,0.3), rgba(34,197,94,0.15))", borderRadius: 5, border: "1px solid rgba(34,197,94,0.25)", display: "flex", alignItems: "center", paddingLeft: 10, gap: 5 }}>
+                <span style={{ fontSize: 9, color: "rgba(34,197,94,0.9)" }}>🎵</span>
+                <span style={{ fontSize: 8, color: "rgba(34,197,94,0.7)", fontWeight: 600 }}>AUDIO TRACK</span>
+              </div>
+            )}
+            {/* Playhead line on audio row */}
+            <div style={{ position: "absolute", left: currentFrame * PX_PER_FRAME, top: 0, bottom: 0, width: 2, background: ACC, opacity: 0.7, transform: "translateX(-1px)", pointerEvents: "none", zIndex: 10 }} />
+          </div>
+
         </div>
       </div>
     </div>
@@ -1536,108 +1705,116 @@ export default function App() {
           updateVoiceover={updateVoiceover}
         />
 
-        {/* ── CapCut-style Preview ── */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#07070f", overflow: "hidden", minHeight: 0 }}>
+        {/* ── Premium Preview ── */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#06060e", overflow: "hidden", minHeight: 0, position: "relative" }}>
 
-          {/* Canvas area */}
+          {/* Canvas stage */}
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
-            {/* Glow bg */}
-            <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 50% 40%, rgba(108,99,255,0.05) 0%, transparent 70%)" }} />
 
-            {/* Fullscreen button */}
-            <button
-              onClick={() => setFullscreenPreview(true)}
-              title="Fullscreen preview (F)"
-              style={{ position: "absolute", top: 10, right: 10, zIndex: 20, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, color: "rgba(255,255,255,0.5)", cursor: "pointer", width: 28, height: 28, fontSize: 12, display: "flex", alignItems: "center", justifyContent: "center" }}
-            >
-              ⛶
-            </button>
-            <div style={{ borderRadius: 14, overflow: "hidden", boxShadow: "0 24px 80px rgba(0,0,0,0.9)", position: "relative", zIndex: 1, width: 248, height: 440 }}>
-              <Player
-                ref={playerRef}
-                key={`${state.layout}-${state.theme.accent}-${state.slides.length}`}
-                component={PortfolioReel}
-                inputProps={inputProps}
-                durationInFrames={totalDuration}
-                fps={30}
-                compositionWidth={1080}
-                compositionHeight={1920}
-                style={{ width: 248, height: 440, display: "block" }}
-                initialFrame={state.slides.length > 0 ? 40 : 0}
-                loop
-                autoPlay
-              />
-              <CanvasOverlay
-                state={state}
-                setTextStyle={setTextStyle}
-                updateSticker={updateSticker}
-                updateTextLayer={updateTextLayer}
-              />
+            {/* Ambient glow bg */}
+            <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 45%, rgba(108,99,255,0.08) 0%, transparent 65%)" }} />
+            {/* Subtle grid pattern */}
+            <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px)", backgroundSize: "40px 40px", pointerEvents: "none" }} />
+
+            {/* Top-right actions */}
+            <div style={{ position: "absolute", top: 10, right: 10, zIndex: 20, display: "flex", gap: 6 }}>
+              {state.audio && (
+                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 9, color: "#22c55e", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 6, padding: "4px 8px", fontWeight: 600 }}>
+                  <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+                  Audio
+                </div>
+              )}
+              <button onClick={() => setFullscreenPreview(true)} title="Fullscreen (F)"
+                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 7, color: "rgba(255,255,255,0.5)", cursor: "pointer", width: 28, height: 28, fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                ⛶
+              </button>
             </div>
-          </div>
 
-          {/* ── Custom Controls Bar ── */}
-          <div style={{ flexShrink: 0, background: "#0c0c18", borderTop: "1px solid rgba(255,255,255,0.07)", padding: "10px 16px 12px" }}>
+            {/* Slide counter badge */}
+            {state.slides.length > 0 && (
+              <div style={{ position: "absolute", top: 10, left: 10, zIndex: 20, fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, padding: "4px 9px", letterSpacing: 0.5 }}>
+                {state.slides.length} SLIDES · {(totalDuration/30).toFixed(1)}s
+              </div>
+            )}
 
-            {/* Seek bar */}
-            <div style={{ position: "relative", marginBottom: 10 }}>
-              <input
-                type="range"
-                min={0}
-                max={totalDuration}
-                value={currentFrame}
-                onChange={(e) => seekTo(Number(e.target.value))}
-                style={{ width: "100%", height: 3, accentColor: ACC, cursor: "pointer" }}
-              />
-              {/* Frame ticks for slides */}
-              <div style={{ position: "absolute", top: -1, left: 0, right: 0, pointerEvents: "none" }}>
-                {state.slides.map((slide, i) => {
+            {/* Player with premium shadow */}
+            <div style={{ position: "relative", zIndex: 1, filter: `drop-shadow(0 32px 80px rgba(0,0,0,0.95)) drop-shadow(0 0 40px ${ACC}1a)` }}>
+              <div style={{ borderRadius: 16, overflow: "hidden", width: 262, height: 465 }}>
+                <Player
+                  ref={playerRef}
+                  key={`${state.layout}-${state.theme.accent}-${state.slides.length}`}
+                  component={PortfolioReel}
+                  inputProps={inputProps}
+                  durationInFrames={totalDuration}
+                  fps={30}
+                  compositionWidth={1080}
+                  compositionHeight={1920}
+                  style={{ width: 262, height: 465, display: "block" }}
+                  initialFrame={state.slides.length > 0 ? 40 : 0}
+                  loop
+                  autoPlay
+                />
+              </div>
+              <CanvasOverlay state={state} setTextStyle={setTextStyle} updateSticker={updateSticker} updateTextLayer={updateTextLayer} />
+            </div>
+
+            {/* Slide dot indicators below player */}
+            {state.slides.length > 1 && (
+              <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 5, zIndex: 10 }}>
+                {state.slides.map((_, i) => {
                   const INTRO = 40;
-                  let pos = INTRO;
-                  for (let j = 0; j < i; j++) pos += state.slides[j].duration + (state.transitions.find(t => t.afterSlideIndex === j)?.duration || 0);
-                  const pct = (pos / totalDuration) * 100;
-                  return <div key={i} style={{ position: "absolute", left: `${pct}%`, top: 0, width: 2, height: 5, background: `${ACC}99`, borderRadius: 1 }} />;
+                  let from = INTRO;
+                  for (let j = 0; j < i; j++) from += state.slides[j].duration + (state.transitions.find(t => t.afterSlideIndex === j)?.duration || 0);
+                  const isActive = currentFrame >= from && currentFrame < from + state.slides[i].duration;
+                  return <div key={i} onClick={() => seekTo(from)} style={{ width: isActive ? 20 : 5, height: 5, borderRadius: 5, background: isActive ? ACC : "rgba(255,255,255,0.2)", cursor: "pointer", transition: "all 0.25s", boxShadow: isActive ? `0 0 8px ${ACC}` : "none" }} />;
                 })}
               </div>
+            )}
+          </div>
+
+          {/* ── Premium Controls Bar ── */}
+          <div style={{ flexShrink: 0, background: "linear-gradient(180deg, #0a0a16 0%, #0c0c1a 100%)", borderTop: "1px solid rgba(255,255,255,0.07)", padding: "8px 14px 12px" }}>
+
+            {/* Custom seek bar */}
+            <div style={{ position: "relative", height: 20, marginBottom: 6, cursor: "pointer" }}
+              onClick={e => { const r = e.currentTarget.getBoundingClientRect(); seekTo(Math.round((e.clientX - r.left) / r.width * totalDuration)); }}
+            >
+              {/* Track */}
+              <div style={{ position: "absolute", top: "50%", left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 3, transform: "translateY(-50%)" }}>
+                {/* Progress fill */}
+                <div style={{ height: "100%", width: `${(currentFrame / totalDuration) * 100}%`, background: `linear-gradient(90deg, ${ACC}, #9c56ff)`, borderRadius: 3, transition: "width 0.05s" }} />
+                {/* Slide markers */}
+                {state.slides.map((slide, i) => {
+                  let pos = 40;
+                  for (let j = 0; j < i; j++) pos += state.slides[j].duration + (state.transitions.find(t => t.afterSlideIndex === j)?.duration || 0);
+                  return <div key={i} style={{ position: "absolute", left: `${(pos / totalDuration) * 100}%`, top: -3, width: 1, height: 9, background: `${ACC}80`, borderRadius: 1 }} />;
+                })}
+              </div>
+              {/* Thumb */}
+              <div style={{ position: "absolute", top: "50%", left: `${(currentFrame / totalDuration) * 100}%`, width: 12, height: 12, borderRadius: "50%", background: "#fff", border: `2px solid ${ACC}`, transform: "translate(-50%, -50%)", boxShadow: `0 0 8px ${ACC}88`, transition: "left 0.05s", pointerEvents: "none" }} />
             </div>
 
             {/* Controls row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <button onClick={() => seekTo(0)} style={ctrlBtn} title="Rewind">⏮</button>
+              <button onClick={() => seekTo(Math.max(0, currentFrame - 30))} style={ctrlBtn} title="-1s">−1s</button>
 
-              {/* Rewind */}
-              <button onClick={() => seekTo(0)} style={ctrlBtn} title="Rewind">
-                ⏮
-              </button>
-
-              {/* Play / Pause */}
-              <button onClick={togglePlay} style={{ ...ctrlBtn, width: 38, height: 38, background: ACC, borderRadius: "50%", fontSize: 14, color: "#fff" }}>
+              {/* Play button */}
+              <button onClick={togglePlay} style={{ width: 36, height: 36, borderRadius: "50%", background: `linear-gradient(135deg, ${ACC}, #9c56ff)`, border: "none", color: "#fff", cursor: "pointer", fontSize: 13, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 4px 16px ${ACC}55`, flexShrink: 0 }}>
                 {isPlaying ? "⏸" : "▶"}
               </button>
 
-              {/* Skip forward 1s */}
-              <button onClick={() => seekTo(Math.min(totalDuration - 1, currentFrame + 30))} style={ctrlBtn} title="+1s">
-                ⏭
-              </button>
+              <button onClick={() => seekTo(Math.min(totalDuration - 1, currentFrame + 30))} style={ctrlBtn} title="+1s">+1s</button>
 
-              {/* Time display */}
-              <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", fontFamily: "monospace", letterSpacing: 0.5 }}>
-                {formatTime(currentFrame)} / {formatTime(totalDuration)}
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontFamily: "monospace", letterSpacing: 0.5, marginLeft: 4 }}>
+                {formatTime(currentFrame)}<span style={{ color: "rgba(255,255,255,0.2)" }}> / </span>{formatTime(totalDuration)}
               </div>
 
               <div style={{ flex: 1 }} />
 
-              {/* Audio indicator */}
-              {state.audio && (
-                <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, color: "#22c55e", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", borderRadius: 6, padding: "3px 8px" }}>
-                  <span>🎵</span> Audio
-                </div>
-              )}
-
-              {/* Layout badge */}
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", background: "rgba(255,255,255,0.05)", borderRadius: 5, padding: "3px 7px", letterSpacing: 0.5, textTransform: "uppercase" }}>
-                {state.layout === "phone_mockup" ? "📱 Mockup" : "⬛ Full"}
+              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.04)", borderRadius: 5, padding: "3px 7px", letterSpacing: 0.5, textTransform: "uppercase", border: "1px solid rgba(255,255,255,0.07)" }}>
+                {state.layout === "phone_mockup" ? "📱" : "⬛"} {state.layout === "phone_mockup" ? "Mockup" : "Full"}
               </div>
-
             </div>
           </div>
         </div>
@@ -1755,6 +1932,7 @@ export default function App() {
             zoomLevel={zoomLevel}
             setZoomLevel={setZoomLevel}
             currentFrame={currentFrame}
+            onSeek={seekTo}
           />
         </div>
       </div>
