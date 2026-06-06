@@ -155,40 +155,42 @@ app.post("/api/generate-image", async (req, res) => {
     // Use workspace-specific base URL from env var
     const apiBase = process.env.QWEN_API_BASE || "https://dashscope.aliyuncs.com";
 
-    const apiBase = process.env.QWEN_API_BASE || "https://dashscope.aliyuncs.com";
-    const dsUrl = `${apiBase}/api/v1/services/aigc/text2image/image-synthesis`;
+    const workspaceBase = process.env.QWEN_API_BASE || "";
 
-    // Try models in order until one works
+    // Endpoint candidates — international DashScope, workspace-specific, then China DashScope
+    const baseUrls = [
+      "https://dashscope-intl.aliyuncs.com",
+      ...(workspaceBase ? [workspaceBase] : []),
+      "https://dashscope.aliyuncs.com",
+    ];
     const models = ["wanx2.1-t2i-turbo", "wanx2.1-t2i-plus", "wanx2.0-t2i-turbo", "wanx-v1"];
+
     let imageUrl = null;
     let lastErr = "";
 
-    for (const model of models) {
-      try {
-        const r = await fetch(dsUrl, {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model,
-            input: { prompt },
-            parameters: { size: "576*1024", n: 1, seed },
-          }),
-        });
-
-        const d = await r.json();
-        console.log(`[generate-image] ${model}:`, JSON.stringify(d).slice(0, 200));
-
-        const url = d?.output?.results?.[0]?.url;
-        if (url) { imageUrl = url; break; }
-
-        lastErr = `${model}: ${d?.message || d?.code || JSON.stringify(d).slice(0,100)}`;
-        if (d?.code !== "InvalidParameter" || !d?.message?.includes("not exist")) break; // stop on non-model errors
-      } catch (e) {
-        lastErr = `${model}: ${e.message}`; break;
+    outer: for (const base of baseUrls) {
+      for (const model of models) {
+        try {
+          const r = await fetch(`${base}/api/v1/services/aigc/text2image/image-synthesis`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model,
+              input: { prompt },
+              parameters: { size: "576*1024", n: 1, seed },
+            }),
+          });
+          const d = await r.json();
+          console.log(`[img] ${base.split(".")[0].split("//")[1]} / ${model}:`, JSON.stringify(d).slice(0, 150));
+          const url = d?.output?.results?.[0]?.url;
+          if (url) { imageUrl = url; break outer; }
+          lastErr = `${model}@${base}: ${d?.message || d?.code || ""}`;
+          if (!d?.message?.includes("not exist") && !d?.message?.includes("Model")) break outer; // hard error, stop
+        } catch (e) { lastErr = `${model}: ${e.message}`; break outer; }
       }
     }
 
-    if (!imageUrl) return res.status(500).json({ error: `No image generated. Last error: ${lastErr}` });
+    if (!imageUrl) return res.status(500).json({ error: lastErr || "No image URL returned" });
 
     // Fetch the image and convert to base64 so the browser can display it
     const imgRes = await fetch(imageUrl);
